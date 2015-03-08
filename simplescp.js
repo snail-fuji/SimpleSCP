@@ -1,5 +1,15 @@
   var operators_number = 0;
   
+  var operators = {
+    "search": "searchElStr3",
+  };
+  
+  var modifiers = [
+    "fixed",
+    "assign", 
+    
+  ];
+  
   function increaseOperatorsNumber() {
     return ++operators_number;
   }
@@ -25,9 +35,12 @@
   }
 
   function parseCallExpression(syntax) {
-//TODO Add name checking to another function
-    return "-> ..operator" + increaseOperatorsNumber() + " (*<br><- " + syntax["callee"]["name"] + ";;<br>" + parseArguments(syntax["arguments"]) + "*);;";
+    return "-> ..operator" + increaseOperatorsNumber() + " (*<br><- " + parseCallee(syntax["callee"]) + ";;<br>" + parseArguments(syntax["arguments"]) + "*);;";
   } 
+  
+  function parseCallee(syntax) {
+    return operators[syntax["name"]];;
+  }
   
   function parseArguments(syntax) {
     arguments = "";
@@ -44,8 +57,7 @@
       element = elements[i];
       if (element["type"] == "Identifier") {
         argument += "rrel_scp_var: "
-//TODO Add this check to another function
-        if (element["name"] == "fixed" || element["name"] == "assign") 
+        if (isModifier(element["name"])) 
           argument += "rrel_" + element["name"] + ": ";
         else {
           argument += element["name"] + ";;<br>";
@@ -54,4 +66,9 @@
       }
     }
     return argument;
+  }
+  
+  function isModifier(syntax) {
+//TODO Move this shit out
+    return modifiers.indexOf(syntax) != -1;
   }
