@@ -1,107 +1,3 @@
-/*  var operators_number = 1;
-  
-  var operators = {
-    "search": "searchEl",
-    "searchAll": "searchSet",
-    "gen": "genEl",
-    "erase": "eraseEl",
-    "eraseAll": "eraseSet",
-    "call": "call",
-  };
-  
-  var modifiers = [
-    "fixed",
-    "assign",     
-  ];
-
-  function increaseOperatorsNumber() {
-    return ++operators_number;
-  }
-  function getOperatorsNumber() {
-    return operators_number;
-  }
-  
-  function parseProgram(syntax) {
-    return "scp_program -> ..program (*<br>" + parseProgramBody(syntax["body"]) + "<br>*);;"; 
-  }
-
-  function parseProgramBody(syntax) {
-    body = ""
-    for(var i = 0; i < syntax.length; i++) {
-      element = syntax[i]
-      if (element["type"] == "ExpressionStatement")
-        body += parseExpression(element["expression"]);
-    }    
-    body = "-> rrel_operators: ... (*<br>" + body + "<br>*);;"
-    return body;
-  }
- 
-  function parseExpression(syntax) {
-    if (syntax["type"] == "CallExpression") 
-      return parseCallExpression(syntax)
-    else if (syntax["type"] == "Identifier")
-      return parseMark(syntax)
-  }
-
-  function parseMark(syntax) {
-  //TODO Add goto statement to mark operator
-    return "-> .." + syntax["name"] + " (*<br>" + " <- print;; <br> " + "rrel_1: rrel_fixed: rrel_scp_const: [];;<br> *);;<br>";
-  }
-
-  function parseCallExpression(syntax) {
-    //TODO get function level
-    parseSCPCallExpression(syntax);
-  } 
-  
-  function parseSCPCallExpression(syntax) {
-    return "-> ..operator" + getOperatorsNumber() + " (*<br>" + parseOperatorHead(syntax["callee"]) + "<br>" + parseOperatorBody(syntax["asguments"]) + "<br>*);;";
-  }
-
-  function parseOperatorHead(syntax) {
-    return "<- "+ operators[syntax["name"]] + ";;";
-  }
-  
-  function parseOperatorBody(syntax) {
-    body = syntax[0]["properties"];  
-    parseArguments(body);
-  }
-  
-  function parseArguments(syntax) {
-    arguments = "";
-    for (var i = 0; i < syntax.length; i++) {
-      arguments += "-> rrel_" + (i + 1) + ": " + parseArgument(syntax[i]);
-    }
-    return arguments;
-  }
-
-  function parseArgument(syntax) {
-    argument = "";
-    var elements = syntax["elements"];
-    for(var i = 0; i < elements.length; i++) {
-      element = elements[i];
-      if (element["type"] == "Identifier") {
-        argument += "rrel_scp_var: "
-        if (isModifier(element["name"])) 
-          argument += "rrel_" + element["name"] + ": ";
-        else {
-          argument += element["name"] + ";;<br>";
-          break;
-        }
-      }
-    }
-    return argument;
-  }
-  
-  function parseTransitions(syntax) {
-        
-  }
-
-  function isModifier(syntax) {
-//TODO Move this shit out
-    return modifiers.indexOf(syntax) != -1;
-  }
-
-*/
 const searchEl = "searchEl";
 const searchElStr3 = "searchElStr3";
 const searchElStr5 = "searchElStr5";
@@ -111,6 +7,8 @@ const genElStr5 = "genElStr5";
 const eraseEl = "eraseEl";
 const eraseElStr3 = "eraseElStr3";
 const eraseElStr5 = "eraseElStr5";
+const printNl = "printNl";
+
 const fixed = "fixed";
 const assign = "assign";
 var modifiers = [
@@ -118,7 +16,10 @@ var modifiers = [
   assign,     
 ];
 var operatorNumber = 1;
-var program;
+var program = "";
+
+
+//TODO fund abstractions and create objects to clean this code from repeats
 
 function search(parameterOne, parameterTwo, parameterThree, parameterFour, parameterFive) {
   if (arguments.length == 1)
@@ -186,8 +87,7 @@ function gen1(parameter) {
       name: getOperatorName(getOperatorNumber()),
       type: genEl,
       1: parameter,
-      then: [],
-      else: [],
+      goto: [],
     }
   );
 }
@@ -200,8 +100,7 @@ function gen3(parameterOne, parameterTwo, parameterThree) {
       1: parameterOne,
       2: parameterTwo,
       3: parameterThree,
-      then: [],
-      else: [],
+      goto: [],
     }
   );
 }
@@ -216,8 +115,7 @@ function gen5(parameterOne, parameterTwo, parameterThree, parameterFour, paramet
       3: parameterThree,
       4: parameterFour,
       5: parameterFive,
-      then: [],
-      else: [],
+      goto: [],
     }
   );
 }
@@ -237,8 +135,7 @@ function erase1(parameter) {
       name: getOperatorName(getOperatorNumber()),
       type: eraseEl,
       1: parameter,
-      then: [],
-      else: [],
+      goto: [],
     }
   );
 }
@@ -251,8 +148,7 @@ function erase3(parameterOne, parameterTwo, parameterThree) {
       1: parameterOne,
       2: parameterTwo,
       3: parameterThree,
-      then: [],
-      else: [],
+      goto: [],
     }
   );
 }
@@ -267,8 +163,18 @@ function erase5(parameterOne, parameterTwo, parameterThree, parameterFour, param
       3: parameterThree,
       4: parameterFour,
       5: parameterFive,
-      then: [],
-      else: [],
+      goto: [],
+    }
+  );
+}
+
+function print(parameter) {
+  return scp(
+    {
+      name: getOperatorName(getOperatorNumber()),
+      type: printNl,
+      1: parameter,
+      goto: [],
     }
   );
 }
@@ -289,6 +195,8 @@ function scp(syntax) {
   if ("then" in syntax) body += parseTransitions("nrel_then", syntax["then"]);
   if ("else" in syntax) body += parseTransitions("nrel_else", syntax["else"]);
   body += "*);;<br>"
+  program += body;
+  increaseOperatorNumber();
   return body;
 }
 
@@ -337,7 +245,9 @@ function increaseOperatorNumber() {
 
 function parse(syntax)
 {
-  return eval(syntax);
+  program = "";
+  eval(syntax);
+  return program;
 }
 
 
