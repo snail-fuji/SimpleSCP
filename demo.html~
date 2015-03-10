@@ -1,5 +1,9 @@
 <script src="esprima.js"></script>
 <script src="simplescp.js"></script>
 <script>
-  document.write(parseProgram(esprima.parse('search([fixed, a], [assign, b], [fixed, c])')));
+  document.write(parseProgram(esprima.parse(' \
+    search([fixed, a], [assign, b], [fixed, c]); \
+    call([fixed, lolka]); \
+')));
 </script>
+  

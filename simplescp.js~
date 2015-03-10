@@ -1,7 +1,12 @@
   var operators_number = 0;
   
   var operators = {
-    "search": "searchElStr3",
+    "search": "searchEl",
+    "searchAll": "searchSet",
+    "gen": "genEl",
+    "erase": "eraseEl",
+    "eraseAll": "eraseSet",
+    "call": "call",
   };
   
   var modifiers = [
@@ -12,6 +17,9 @@
   
   function increaseOperatorsNumber() {
     return ++operators_number;
+  }
+  function getOperatorsNumber() {
+    return operators_number;
   }
   
   function parseProgram(syntax) {
@@ -35,7 +43,8 @@
   }
 
   function parseCallExpression(syntax) {
-    return "-> ..operator" + increaseOperatorsNumber() + " (*<br><- " + parseCallee(syntax["callee"]) + ";;<br>" + parseArguments(syntax["arguments"]) + "*);;";
+//TODO check if base function
+    return "-> ..operator" + getOperatorsNumber() + " (*<br><- " + parseCallee(syntax["callee"]) + ";;<br>" + parseArguments(syntax["arguments"]) + "=> nrel_goto: ..operator" + increaseOperatorsNumber() + ";;<br>*);;";
   } 
   
   function parseCallee(syntax) {
