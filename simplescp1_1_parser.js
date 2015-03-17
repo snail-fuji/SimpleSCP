@@ -19,8 +19,11 @@ function parseProgram(syntax) {
     parseStatement(body[i], operators);
   }
   operator = new Operator("return", [], new LinearTransition());
-  if (operators.length > 0) 
+  if (operators.length > 0) {
     operators[operators.length - 1].transition = new LinearTransition(operator);
+    operators.push(operator);
+  }
+
   return new Program(operators);
 }
 
