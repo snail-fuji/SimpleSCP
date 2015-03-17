@@ -16,8 +16,8 @@ function Program(operators) {
   }
 }
 function Operator(type, arguments, transition) {
-  Operator.maxId = ++Operator.maxId || 0;
-  this.id = Operator.maxId;
+  //Operator.maxId = ++Operator.maxId || 0;
+  //this.id = 100;
   this.type = type
   this.arguments = arguments;
   this.transition = transition;
@@ -29,15 +29,17 @@ function Operator(type, arguments, transition) {
   }
   this.getArguments = function() {
   	argumentString = "";
-	  for(var i = 0; i < this.arguments.length; i++) {
+	  /*for(i = 0; i < this.arguments.length; i++) {
       argument = this.arguments[i];
 	    argumentString += "-> " + argument.toString() + ";;<br>";
-	  }
+	  }*/
 	  return argumentString;
   }
+  alert(this.getArguments());
   this.getName = function() {
-  	return "..operator" + this.id;
+  	return "..operator";
   }
+  alert(this.toString());
 }
 
 function Argument(name) {

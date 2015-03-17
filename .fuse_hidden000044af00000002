@@ -10,14 +10,15 @@ function parseProgram(syntax) {
   operators = [];
   body = syntax["body"];
   for(i = 0; i < body.length; i++) {
-    operator = parseOperator(body[i]);
-    operators.push(operator);
+    //operator = parseOperator(body[i]);
+    //operators.push(operator);
+    parseStatement(body[i], operators);
   }
   return new Program(operators);
 }
 
 
-function parseOperator(operator) {
+/*function parseOperator(operator) {
   switch(operator["type"]) {
     //case "BlockStatement":
       //return parseBlockStatement(operator);
@@ -27,6 +28,14 @@ function parseOperator(operator) {
       //break;
     case "ExpressionStatement":
       return parseExpressionStatement(operator["expression"]);
+  }
+}*/
+
+function parseStatement(statement, statementArray) {
+  switch(statement["type"]) {
+    case "ExpressionStatement":
+      //TODO add expression parser + linear transition from previous operator if exists
+      break;
   }
 }
 

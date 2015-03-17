@@ -1,5 +1,6 @@
 const languageOperators = [
   "search",
+  "lolka",
 ]
 function parse(code) {
   syntax = esprima.parse(code);
@@ -9,24 +10,20 @@ function parse(code) {
 function parseProgram(syntax) {
   operators = [];
   body = syntax["body"];
-  for(i = 0; i < body.length; i++) {
-    operator = parseOperator(body[i]);
-    operators.push(operator);
+  for(var i = 0; i < body.length; i++) {
+    parseStatement(body[i], operators);
   }
   return new Program(operators);
 }
 
-
-function parseOperator(operator) {
-  switch(operator["type"]) {
-    //case "BlockStatement":
-      //return parseBlockStatement(operator);
-      //break;
-    //case "IfStatement": 
-      //return parseIfStatement(operator);
-      //break;
+function parseStatement(statement, statementArray) {
+  switch(statement["type"]) {
     case "ExpressionStatement":
-      return parseExpressionStatement(operator["expression"]);
+      operator = parseExpressionStatement(statement["expression"]);
+      if (statementArray.length > 0) 
+        statementArray[statementArray.length - 1].transition = new LinearTransition(operator);
+      statementArray.push(operator);
+      break;
   }
 }
 
@@ -48,8 +45,7 @@ function parseLanguageOperator(languageOperator) {
   name = languageOperator["callee"]["name"];
   arguments = parseArguments(languageOperator["arguments"]);
   transition = new LinearTransition();
-  var a = new Operator(name , arguments, transition);
-  return a;
+  return new Operator(name, arguments, transition);
 }
 
 function parseArguments(argumentArray) {
