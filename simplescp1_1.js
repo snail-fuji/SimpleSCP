@@ -8,7 +8,7 @@ function Program(operators) {
   }
   this.getOperators = function() {
   	operatorString = "-> rrel_operators: ... (*<br>";
-	  for(i = 0; i < this.operators.length; i++) {
+	  for(var i = 0; i < this.operators.length; i++) {
 	    operator = operators[i];
 	    operatorString += "-> " + operator.toString() + "<br>";
 	  }
@@ -65,7 +65,7 @@ function ArgumentDecorator(name, argument) {
   this.identifier = name;
   this.argument = argument;
   this.toString = function() {
-    return "rrel_" + this.identifier + ": " + this.argument;
+    return "rrel_" + this.identifier + ": " + this.argument.toString();
   }
 }
 

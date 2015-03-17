@@ -1,6 +1,11 @@
 const languageOperators = [
-  "search",
-  "lolka",
+  "searchElStr3",
+  "searchEl",
+  "searchElStr5",
+]
+const modifiers = [
+  "fixed",
+  "assign",
 ]
 function parse(code) {
   syntax = esprima.parse(code);
@@ -13,6 +18,9 @@ function parseProgram(syntax) {
   for(var i = 0; i < body.length; i++) {
     parseStatement(body[i], operators);
   }
+  operator = new Operator("return", [], new LinearTransition());
+  if (operators.length > 0) 
+    operators[operators.length - 1].transition = new LinearTransition(operator);
   return new Program(operators);
 }
 
@@ -61,13 +69,17 @@ function parseArgument(argument) {
   if (argument.length != 0) {
     element = argument[0]; 
     argument.splice(0, 1);
-    switch (element["name"]) {
-      default:
-        return new VariableArgument(element["name"]);
+    if (isModifier(element["name"])) {
+      return new ArgumentDecorator(element["name"], parseArgument(argument));
     }
+    return new VariableArgument(element["name"]);
   }
 }
 
 function isLanguageOperator(languageOperator) {
   return (languageOperators.indexOf(languageOperator) != -1)
+}
+
+function isModifier(modifier) {
+  return (modifiers.indexOf(modifier) != -1) 
 }

@@ -1,7 +1,0 @@
-<script src="esprima.js"></script>
-<script src="simplescp1_1.js"></script>
-<script src="simplescp1_1_parser.js"></script>
-<script>
-  document.write(parse("search([fixed, a]);"));
-</script>
-  
