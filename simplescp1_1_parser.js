@@ -55,7 +55,7 @@ function parseFunction(syntax) {
   operators = [];
   body = syntax["body"]["body"];
   for(var i = 0; i < body.length; i++) {
-    parseStatement(body[i], operators);
+    parseStatement(body[i], operators, parameters);
   }
   operator = new Operator("return", [], new LinearTransition());
   if (operators.length > 0) {
@@ -69,13 +69,17 @@ function parseParameter(parameter) {
   return new ArgumentDecorator("in", new ConstantArgument(parameter["name"]));
 }
 
-function parseStatement(statement, statementArray) {
+function parseStatement(statement, statementArray, parameterArray) {
   switch(statement["type"]) {
     case "ExpressionStatement":
       operator = parseExpressionStatement(statement["expression"]);
       if (statementArray.length > 0) 
         statementArray[statementArray.length - 1].transition = new LinearTransition(operator);
       statementArray.push(operator);
+      break;
+    case "ReturnStatement":
+      parameter = new ArgumentDecorator(parameterArray.length + 1, new ArgumentDecorator("out", new ArgumentDecorator("assign", new VariableArgument(statement["argument"]["name"]))));
+      parameterArray.push(parameter);
       break;
   }
 }
