@@ -26,8 +26,8 @@ function Program(parameters, operators) {
     return parameterString;  
   }
 }
+
 function Operator(type, arguments, transition) {
-  //Operator.maxId = ++Operator.maxId || 0;
   this.id = Math.floor(Math.random()*65536);
   this.type = type
   this.arguments = arguments;
@@ -54,7 +54,7 @@ function Operator(type, arguments, transition) {
 function Argument(name) {
   this.identifier = name;
 }
-
+//TODO add superclass constructor
 VariableArgument.prototype = Argument;
 function VariableArgument(name) {
   this.identifier = name;

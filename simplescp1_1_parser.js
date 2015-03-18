@@ -1,11 +1,32 @@
-const languageOperators = [
+const simpleLanguageOperators = [
   "searchElStr3",
   "searchEl",
   "searchElStr5",
+  "genEl",
+  "genElStr3",
+  "genElStr5",
+  "eraseEl",
+  "eraseElStr3",
+  "eraseElStr5",
+]
+const setLanguageOperators = [
+  "searchSetStr3",
+  "searchSet",
+  "searchSetStr5",
+  "genSet",
+  "genSetStr3",
+  "genSetStr5",
+  "eraseSet",
+  "eraseSetStr3",
+  "eraseSetStr5",
 ]
 const modifiers = [
   "fixed",
   "assign",
+  "pos_const_perm",
+  "arc",
+  "node",
+  "erase",
 ]
 function parse(code) {
   syntax = esprima.parse(code);
@@ -65,17 +86,28 @@ function parseExpressionStatement(expression) {
       return parseCallExpression(expression);
   }
 }
-
+//TODO add switch block
 function parseCallExpression(expression) {
-  if (isLanguageOperator(expression["callee"]["name"])) {
-    return parseLanguageOperator(expression);
+  if (isSimpleLanguageOperator(expression["callee"]["name"])) {
+    return parseSimpleLanguageOperator(expression);
+  }
+  else if (isSetLanguageOperator(expression["callee"]["name"])) {
+    return parseSetLanguageOperator(expression);
   }
 }
-
-function parseLanguageOperator(languageOperator) {
+//TODO Do parsing more simply. Be DRY.
+function parseSimpleLanguageOperator(languageOperator) {
   //TODO Check linear transition
   name = languageOperator["callee"]["name"];
   arguments = parseArguments(languageOperator["arguments"]);
+  transition = new LinearTransition();
+  return new Operator(name, arguments, transition);
+}
+
+function parseSetLanguageOperator(languageOperator) {
+  //TODO Check linear transition
+  name = languageOperator["callee"]["name"];
+  arguments = parseSetArguments(languageOperator["arguments"]);
   transition = new LinearTransition();
   return new Operator(name, arguments, transition);
 }
@@ -84,7 +116,23 @@ function parseArguments(argumentArray) {
   arguments = [];
   for(var i = 0; i < argumentArray.length; i++) {
     argument = argumentArray[i]["elements"];
-    arguments.push(new ArgumentDecorator((i + 1), parseArgument(argument)));
+    temporaryArgument = parseArgument(argument);
+    if (temporaryArgument) arguments.push(new ArgumentDecorator((i + 1), temporaryArgument));
+  }
+  return arguments;
+}
+
+function parseSetArguments(argumentArray) {
+  arguments = [];
+  for(var i = 0; i < argumentArray.length; i++) {
+    argument = argumentArray[i]["elements"];
+    temporaryArgument = parseArgument(argument);
+    if (temporaryArgument) { 
+      if (i < argumentArray.length / 2)
+        arguments.push(new ArgumentDecorator((i + 1), temporaryArgument));
+      else 
+        arguments.push(new ArgumentDecorator("set_"+(i + 1 - argumentArray.length / 2), temporaryArgument));
+    }
   }
   return arguments;
 }
@@ -100,8 +148,12 @@ function parseArgument(argument) {
   }
 }
 
-function isLanguageOperator(languageOperator) {
-  return (languageOperators.indexOf(languageOperator) != -1)
+function isSimpleLanguageOperator(languageOperator) {
+  return (simpleLanguageOperators.indexOf(languageOperator) != -1)
+}
+
+function isSetLanguageOperator(languageOperator) {
+  return (setLanguageOperators.indexOf(languageOperator) != -1)
 }
 
 function isModifier(modifier) {
