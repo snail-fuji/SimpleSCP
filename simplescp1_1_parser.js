@@ -9,9 +9,9 @@ const modifiers = [
 ]
 function parse(code) {
   syntax = esprima.parse(code);
-  return parseProgram(syntax).toString();
+  return parseFunction(syntax["body"][0]).toString();
 }
-
+/*
 function parseProgram(syntax) {
   operators = [];
   body = syntax["body"];
@@ -25,6 +25,27 @@ function parseProgram(syntax) {
   }
 
   return new Program(operators);
+}
+*/
+function parseFunction(syntax) {
+  parameters = [];
+  for(var i = 0; i < syntax.params.length; i++) 
+    parameters.push(new ArgumentDecorator((i + 1), parseParameter(syntax.params[i])));
+  operators = [];
+  body = syntax["body"]["body"];
+  for(var i = 0; i < body.length; i++) {
+    parseStatement(body[i], operators);
+  }
+  operator = new Operator("return", [], new LinearTransition());
+  if (operators.length > 0) {
+    operators[operators.length - 1].transition = new LinearTransition(operator);
+    operators.push(operator);
+  }
+  return new Program(parameters, operators);
+}
+
+function parseParameter(parameter) {
+  return new ArgumentDecorator("in", new ConstantArgument(parameter["name"]));
 }
 
 function parseStatement(statement, statementArray) {
@@ -63,7 +84,7 @@ function parseArguments(argumentArray) {
   arguments = [];
   for(var i = 0; i < argumentArray.length; i++) {
     argument = argumentArray[i]["elements"];
-    arguments.push(parseArgument(argument));
+    arguments.push(new ArgumentDecorator((i + 1), parseArgument(argument)));
   }
   return arguments;
 }

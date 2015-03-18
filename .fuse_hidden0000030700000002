@@ -3,18 +3,21 @@
 <script src="simplescp1_1_parser.js"></script>
 <script>
 function startParser() {
-  document.getElementById("program").innerHTML = parse(document.getElementById("source").value);
+  document.getElementById("program").value = parse(document.getElementById("source").value));
 }
 </script>
 <table>
   <tr>
     <td>
-      <textarea id="source" rows = "30" cols="80" onkeydown="startParser()">
+      <textarea id="source" rows = "30" cols="80">
 function ololo() {
-  searchEl([fixed, a]);
+	searchEl([fixed, a]);
 }
-      </textarea>
+      </textarea> <br>
+      <input type="submit" onclick="startParser()">
     </td>
+  </tr>
+  <tr>
     <td>
     <div id="program"></div>
     </td>

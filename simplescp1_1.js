@@ -1,7 +1,8 @@
-function Program(operators) {
+function Program(parameters, operators) {
+  this.parameters = parameters || [];
   this.operators = operators || [];
   this.toString = function() {
-  	return "scp_program -> " + this.getName() + " (*<br>" + this.getOperators() + "*);;";
+  	return "scp_program -> " + this.getName() + " (*<br>" + this.getParameters() +this.getOperators() + "*);;";
   }
   this.getName = function() {
   	return "..program";
@@ -12,12 +13,22 @@ function Program(operators) {
 	    operator = operators[i];
 	    operatorString += "-> " + operator.toString() + "<br>";
 	  }
+    operatorString += "*);;<br>";
 	  return operatorString;
+  }
+  this.getParameters = function() {
+    parameterString = "-> rrel_params: ... (*<br>";
+    for(var i = 0; i < this.parameters.length; i++) {
+      parameter = parameters[i];
+      parameterString += "-> " + parameter.toString() + ";;<br>";
+    }
+    parameterString += "*);;<br>";
+    return parameterString;  
   }
 }
 function Operator(type, arguments, transition) {
-  Operator.maxId = ++Operator.maxId || 0;
-  this.id = Operator.maxId;
+  //Operator.maxId = ++Operator.maxId || 0;
+  this.id = Math.floor(Math.random()*65536);
   this.type = type
   this.arguments = arguments;
   this.transition = transition;
