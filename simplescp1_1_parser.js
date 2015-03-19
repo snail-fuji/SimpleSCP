@@ -1,3 +1,5 @@
+//TODO Refactor this all - do it in objects
+const call = "call";
 const simpleLanguageOperators = [
   "searchElStr3",
   "searchEl",
@@ -8,6 +10,7 @@ const simpleLanguageOperators = [
   "eraseEl",
   "eraseElStr3",
   "eraseElStr5",
+  "sys_search",
 ]
 const setLanguageOperators = [
   "searchSetStr3",
@@ -32,26 +35,12 @@ function parse(code) {
   syntax = esprima.parse(code);
   return parseFunction(syntax["body"][0]).toString();
 }
-/*
-function parseProgram(syntax) {
-  operators = [];
-  body = syntax["body"];
-  for(var i = 0; i < body.length; i++) {
-    parseStatement(body[i], operators);
-  }
-  operator = new Operator("return", [], new LinearTransition());
-  if (operators.length > 0) {
-    operators[operators.length - 1].transition = new LinearTransition(operator);
-    operators.push(operator);
-  }
 
-  return new Program(operators);
-}
-*/
 function parseFunction(syntax) {
   parameters = [];
-  for(var i = 0; i < syntax.params.length; i++) 
-    parameters.push(new ArgumentDecorator((i + 1), parseParameter(syntax.params[i])));
+  for(var i = 0; i < syntax.params.length; i++) { 
+    parameters.push(parseInParameter(i + 1, syntax.params[i]));
+  }
   operators = [];
   body = syntax["body"]["body"];
   for(var i = 0; i < body.length; i++) {
@@ -65,8 +54,12 @@ function parseFunction(syntax) {
   return new Program(parameters, operators);
 }
 
-function parseParameter(parameter) {
-  return new ArgumentDecorator("in", new ConstantArgument(parameter["name"]));
+function parseInParameter(number, parameter) {
+  return new ArgumentDecorator(number, new ArgumentDecorator("fixed", new ArgumentDecorator("in", new VariableArgument(parameter["name"]))));
+}
+
+function parseOutParameter(number, parameter) {
+  return new ArgumentDecorator(number, new ArgumentDecorator("out", new ArgumentDecorator("assign", new VariableArgument(parameter["name"]))));
 }
 
 function parseStatement(statement, statementArray, parameterArray) {
@@ -78,7 +71,8 @@ function parseStatement(statement, statementArray, parameterArray) {
       statementArray.push(operator);
       break;
     case "ReturnStatement":
-      parameter = new ArgumentDecorator(parameterArray.length + 1, new ArgumentDecorator("out", new ArgumentDecorator("assign", new VariableArgument(statement["argument"]["name"]))));
+      parameter = parseOutParameter(parameterArray.length + 1, statement["argument"]);
+      //operator = new Operator("varAssign", );
       parameterArray.push(parameter);
       break;
   }
@@ -98,6 +92,9 @@ function parseCallExpression(expression) {
   else if (isSetLanguageOperator(expression["callee"]["name"])) {
     return parseSetLanguageOperator(expression);
   }
+  else {
+    return parseUserFunction(expression);
+  }
 }
 //TODO Do parsing more simply. Be DRY.
 function parseSimpleLanguageOperator(languageOperator) {
@@ -114,6 +111,15 @@ function parseSetLanguageOperator(languageOperator) {
   arguments = parseSetArguments(languageOperator["arguments"]);
   transition = new LinearTransition();
   return new Operator(name, arguments, transition);
+}
+
+function parseUserFunction(expression) {
+  name = new ArgumentDecorator(1, new ArgumentDecorator("fixed", new ConstantArgument(expression["callee"]["name"])));
+  callArguments = new ArgumentDecorator(2, new ArgumentSet(parseArguments(expression["arguments"])));
+  process = new ArgumentDecorator(3, new ArgumentDecorator("assign", new VariableArgument("..process")));
+  arguments = [name, callArguments, process];
+  operator = new Operator(call, arguments, new LinearTransition());
+  return operator;
 }
 
 function parseArguments(argumentArray) {

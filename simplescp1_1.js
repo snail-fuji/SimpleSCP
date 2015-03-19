@@ -54,6 +54,19 @@ function Operator(type, arguments, transition) {
 function Argument(name) {
   this.identifier = name;
 }
+
+function ArgumentSet(arguments) {
+  this.arguments = arguments;
+  this.toString = function() {
+    body = "... (*<br>";
+    for(var i = 0; i < this.arguments.length; i++) {
+      argument = this.arguments[i];
+      body += "-> " + argument.toString() + ";;<br>";
+    }
+    body += "*);;"
+    return body;
+  }
+}
 //TODO add superclass constructor
 VariableArgument.prototype = Argument;
 function VariableArgument(name) {
