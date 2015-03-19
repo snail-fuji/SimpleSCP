@@ -63,7 +63,7 @@ function ArgumentSet(arguments) {
       argument = this.arguments[i];
       body += "-> " + argument.toString() + ";;<br>";
     }
-    body += "*);;"
+    body += "*)"
     return body;
   }
 }

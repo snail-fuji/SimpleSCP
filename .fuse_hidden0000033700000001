@@ -1,6 +1,5 @@
 //TODO Refactor this all - do it in objects
 const call = "call";
-const waitReturn = "waitReturn";
 const simpleLanguageOperators = [
   "searchElStr3",
   "searchEl",
@@ -45,14 +44,7 @@ function parseFunction(syntax) {
   operators = [];
   body = syntax["body"]["body"];
   for(var i = 0; i < body.length; i++) {
-    //parseStatement(body[i], operators, parameters);
-    temporaryOperators = parseStatement(body[i], parameters);
-    if (temporaryOperators) {
-      if (operators.length > 0) 
-        operators[operators.length - 1].transition = new LinearTransition(temporaryOperators[0]);
-      for(var j = 0; j < temporaryOperators.length; j++) 
-        operators.push(temporaryOperators[j]); 
-    }
+    parseStatement(body[i], operators, parameters);
   }
   operator = new Operator("return", [], new LinearTransition());
   if (operators.length > 0) {
@@ -70,13 +62,17 @@ function parseOutParameter(number, parameter) {
   return new ArgumentDecorator(number, new ArgumentDecorator("out", new ArgumentDecorator("assign", new VariableArgument(parameter["name"]))));
 }
 
-function parseStatement(statement, parameterArray) {
+function parseStatement(statement, statementArray, parameterArray) {
   switch(statement["type"]) {
     case "ExpressionStatement":
-      return parseExpressionStatement(statement["expression"]);
+      operator = parseExpressionStatement(statement["expression"]);
+      if (statementArray.length > 0) 
+        statementArray[statementArray.length - 1].transition = new LinearTransition(operator);
+      statementArray.push(operator);
       break;
     case "ReturnStatement":
       parameter = parseOutParameter(parameterArray.length + 1, statement["argument"]);
+      //operator = new Operator("varAssign", );
       parameterArray.push(parameter);
       break;
   }
@@ -106,7 +102,7 @@ function parseSimpleLanguageOperator(languageOperator) {
   name = languageOperator["callee"]["name"];
   arguments = parseArguments(languageOperator["arguments"]);
   transition = new LinearTransition();
-  return [new Operator(name, arguments, transition)];
+  return new Operator(name, arguments, transition);
 }
 
 function parseSetLanguageOperator(languageOperator) {
@@ -114,17 +110,16 @@ function parseSetLanguageOperator(languageOperator) {
   name = languageOperator["callee"]["name"];
   arguments = parseSetArguments(languageOperator["arguments"]);
   transition = new LinearTransition();
-  return [new Operator(name, arguments, transition)];
+  return new Operator(name, arguments, transition);
 }
 
 function parseUserFunction(expression) {
-  name = new ArgumentDecorator(1, new ConstantArgument(expression["callee"]["name"]));
+  name = new ArgumentDecorator(1, new ArgumentDecorator("fixed", new ConstantArgument(expression["callee"]["name"])));
   callArguments = new ArgumentDecorator(2, new ArgumentSet(parseArguments(expression["arguments"])));
-  process = new ArgumentDecorator(3, new ArgumentDecorator("assign", new VariableArgument("process")));
+  process = new ArgumentDecorator(3, new ArgumentDecorator("assign", new VariableArgument("..process")));
   arguments = [name, callArguments, process];
-  waiter = new Operator(waitReturn, [process], new LinearTransition());
-  caller = new Operator(call, arguments, new LinearTransition(waiter));
-  return [caller, waiter];
+  operator = new Operator(call, arguments, new LinearTransition());
+  return operator;
 }
 
 function parseArguments(argumentArray) {
