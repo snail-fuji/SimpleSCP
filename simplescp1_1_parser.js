@@ -38,23 +38,12 @@ function parse(code) {
 }
 
 function parseFunction(syntax) {
-  parameters = [];
+  var parameters = [];
   for(var i = 0; i < syntax.params.length; i++) { 
     parameters.push(parseInParameter(i + 1, syntax.params[i]));
   }
-  operators = [];
-  body = syntax["body"]["body"];
-  for(var i = 0; i < body.length; i++) {
-    //parseStatement(body[i], operators, parameters);
-    temporaryOperators = parseStatement(body[i], parameters);
-    if (temporaryOperators) {
-      if (operators.length > 0) 
-        operators[operators.length - 1].transition = new LinearTransition(temporaryOperators[0]);
-      for(var j = 0; j < temporaryOperators.length; j++) 
-        operators.push(temporaryOperators[j]); 
-    }
-  }
-  operator = new Operator("return", [], new LinearTransition());
+  var operators = parseBlockStatement(syntax["body"], parameters);
+  var operator = new Operator("return", [], new LinearTransition());
   if (operators.length > 0) {
     operators[operators.length - 1].transition = new LinearTransition(operator);
     operators.push(operator);
@@ -75,8 +64,11 @@ function parseStatement(statement, parameterArray) {
     case "ExpressionStatement":
       return parseExpressionStatement(statement["expression"]);
       break;
+    case "BlockStatement":
+      return parseBlockStatement(statement, parameterArray);
+      break;
     case "ReturnStatement":
-      parameter = parseOutParameter(parameterArray.length + 1, statement["argument"]);
+      var parameter = parseOutParameter(parameterArray.length + 1, statement["argument"]);
       parameterArray.push(parameter);
       break;
   }
@@ -88,6 +80,25 @@ function parseExpressionStatement(expression) {
       return parseCallExpression(expression);
   }
 }
+
+//TODO Add this to parseFunction
+function parseBlockStatement(block, parameters) {
+  var temporaryOperators;
+  var operators = [];
+  var body = block["body"];
+  for(var i = 0; i < body.length; i++)
+  {
+    temporaryOperators = parseStatement(body[i], parameters);
+    if (temporaryOperators) {
+      if (operators.length > 0) 
+        operators[operators.length - 1].transition = new LinearTransition(temporaryOperators[0]);
+      for(var j = 0; j < temporaryOperators.length; j++) 
+        operators.push(temporaryOperators[j]); 
+    }
+  }
+  return operators;
+}
+
 //TODO add switch block
 function parseCallExpression(expression) {
   if (isSimpleLanguageOperator(expression["callee"]["name"])) {
@@ -103,45 +114,46 @@ function parseCallExpression(expression) {
 //TODO Do parsing more simply. Be DRY.
 function parseSimpleLanguageOperator(languageOperator) {
   //TODO Check linear transition
-  name = languageOperator["callee"]["name"];
-  arguments = parseArguments(languageOperator["arguments"]);
-  transition = new LinearTransition();
+  var name = languageOperator["callee"]["name"];
+  var arguments = parseArguments(languageOperator["arguments"]);
+  var transition = new LinearTransition();
   return [new Operator(name, arguments, transition)];
 }
 
 function parseSetLanguageOperator(languageOperator) {
   //TODO Check linear transition
-  name = languageOperator["callee"]["name"];
-  arguments = parseSetArguments(languageOperator["arguments"]);
-  transition = new LinearTransition();
+  var name = languageOperator["callee"]["name"];
+  var arguments = parseSetArguments(languageOperator["arguments"]);
+  var transition = new LinearTransition();
   return [new Operator(name, arguments, transition)];
 }
 
 function parseUserFunction(expression) {
-  name = new ArgumentDecorator(1, new ConstantArgument(expression["callee"]["name"]));
-  callArguments = new ArgumentDecorator(2, new ArgumentSet(parseArguments(expression["arguments"])));
-  process = new ArgumentDecorator(3, new ArgumentDecorator("assign", new VariableArgument("process")));
-  arguments = [name, callArguments, process];
-  waiter = new Operator(waitReturn, [process], new LinearTransition());
-  caller = new Operator(call, arguments, new LinearTransition(waiter));
+  var name = new ArgumentDecorator(1, new ConstantArgument(expression["callee"]["name"]));
+  var callArguments = new ArgumentDecorator(2, new ArgumentSet(parseArguments(expression["arguments"])));
+  var process_assign = new ArgumentDecorator(3, new ArgumentDecorator("assign", new VariableArgument("process")));
+  var process_fixed = new ArgumentDecorator(1, new ArgumentDecorator("fixed", new VariableArgument("process")));
+  var arguments = [name, callArguments, process_assign];
+  var waiter = new Operator(waitReturn, [process_fixed], new LinearTransition());
+  var caller = new Operator(call, arguments, new LinearTransition(waiter));
   return [caller, waiter];
 }
 
 function parseArguments(argumentArray) {
-  arguments = [];
+  var arguments = [];
   for(var i = 0; i < argumentArray.length; i++) {
-    argument = argumentArray[i]["elements"];
-    temporaryArgument = parseArgument(argument);
+    var argument = argumentArray[i]["elements"];
+    var temporaryArgument = parseArgument(argument);
     if (temporaryArgument) arguments.push(new ArgumentDecorator((i + 1), temporaryArgument));
   }
   return arguments;
 }
 
 function parseSetArguments(argumentArray) {
-  arguments = [];
+  var arguments = [];
   for(var i = 0; i < argumentArray.length; i++) {
-    argument = argumentArray[i]["elements"];
-    temporaryArgument = parseArgument(argument);
+    var argument = argumentArray[i]["elements"];
+    var temporaryArgument = parseArgument(argument);
     if (temporaryArgument) { 
       if (i < argumentArray.length / 2)
         arguments.push(new ArgumentDecorator((i + 1), temporaryArgument));
@@ -154,7 +166,7 @@ function parseSetArguments(argumentArray) {
 
 function parseArgument(argument) {
   if (argument.length != 0) {
-    element = argument[0]; 
+    var element = argument[0]; 
     argument.splice(0, 1);
     if (isModifier(element["name"])) {
       return new ArgumentDecorator(element["name"], parseArgument(argument));

@@ -8,18 +8,18 @@ function Program(parameters, operators) {
   	return "..program";
   }
   this.getOperators = function() {
-  	operatorString = "-> rrel_operators: ... (*<br>";
+  	var operatorString = "-> rrel_operators: ... (*<br>";
 	  for(var i = 0; i < this.operators.length; i++) {
-	    operator = operators[i];
+	    var operator = operators[i];
 	    operatorString += "-> " + operator.toString() + "<br>";
 	  }
     operatorString += "*);;<br>";
 	  return operatorString;
   }
   this.getParameters = function() {
-    parameterString = "-> rrel_params: ... (*<br>";
+    var parameterString = "-> rrel_params: ... (*<br>";
     for(var i = 0; i < this.parameters.length; i++) {
-      parameter = parameters[i];
+      var parameter = parameters[i];
       parameterString += "-> " + parameter.toString() + ";;<br>";
     }
     parameterString += "*);;<br>";
@@ -39,9 +39,9 @@ function Operator(type, arguments, transition) {
     return "<-  " + this.type + ";;<br>";
   }
   this.getArguments = function() {
-  	argumentString = "";
+  	var argumentString = "";
 	  for(var i = 0; i < this.arguments.length; i++) {
-      argument = this.arguments[i];
+      var argument = this.arguments[i];
 	    argumentString += "-> " + argument.toString() + ";;<br>";
 	  }
 	  return argumentString;
@@ -58,9 +58,9 @@ function Argument(name) {
 function ArgumentSet(arguments) {
   this.arguments = arguments;
   this.toString = function() {
-    body = "... (*<br>";
+    var body = "... (*<br>";
     for(var i = 0; i < this.arguments.length; i++) {
-      argument = this.arguments[i];
+      var argument = this.arguments[i];
       body += "-> " + argument.toString() + ";;<br>";
     }
     body += "*)"
@@ -97,7 +97,7 @@ function ConditionalTransition(thenOperator, elseOperator) {
   this.thenOperator = thenOperator;
   this.elseOperator = elseOperator;
   this.toString = function() {
-    body = "";
+    var body = "";
 	  if (thenOperator) body += "=> nrel_then: " + this.thenOperator.getName() + ";;<br>";
 	  if (elseOperator) body += "=> nrel_else: " + this.elseOperator.getName() + ";;<br>";
 	  return body;
@@ -107,25 +107,8 @@ function ConditionalTransition(thenOperator, elseOperator) {
 function LinearTransition(nextOperator) {
   this.nextOperator = nextOperator;
   this.toString = function() {
-    body = "";
+    var body = "";
     if (nextOperator) body = "=> nrel_goto: " + this.nextOperator.getName() + ";;<br>";
     return body;
   }
-}
-
-
-function test() {
-  operators = [];
-  operator = new Operator(
-  	"searchElStr3",
-  	[
-  	  new VariableArgument("a"),
-  	  new ArgumentDecorator("1", new ConstantArgument("b")), 
-  	  new VariableArgument("c"),
-  	],
-  	new ConditionalTransition(null, null)
-  	);
-  operators.push(operator);
-  program = new Program(operators);
-  document.write(program.toString());
 }
