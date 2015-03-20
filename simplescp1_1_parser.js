@@ -67,6 +67,9 @@ function parseStatement(statement, parameterArray) {
     case "BlockStatement":
       return parseBlockStatement(statement, parameterArray);
       break;
+    case "IfStatement":
+      return parseIfStatement(statement, parameterArray);
+      break;
     case "ReturnStatement":
       var parameter = parseOutParameter(parameterArray.length + 1, statement["argument"]);
       parameterArray.push(parameter);
@@ -81,7 +84,6 @@ function parseExpressionStatement(expression) {
   }
 }
 
-//TODO Add this to parseFunction
 function parseBlockStatement(block, parameters) {
   var temporaryOperators;
   var operators = [];
@@ -97,6 +99,16 @@ function parseBlockStatement(block, parameters) {
     }
   }
   return operators;
+}
+
+function parseIfStatement(condition, parameters) {
+  //test = parseExpressionStatement(condition["test"])[0];
+  //consequent = parseStatement(condition["consequent"]);
+  //alternate = parseStatement(condition[""]);
+  //alert(new ConditionalTransition(consequent[0], consequent[0]));
+  //test.transition = new ConditionalTransition(consequent[0], consequent[0]);
+  //alert(test.transition);
+  //return [test];
 }
 
 //TODO add switch block

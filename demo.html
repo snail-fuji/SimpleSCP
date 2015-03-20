@@ -10,10 +10,21 @@ function startParser() {
   <tr>
     <td>
       <textarea id="source" rows = "30" cols="80" onkeydown="startParser()">
-function ololo() {
-  {searchElStr3([assign, a], [assign, b], [assign, c]);}
-  searchElStr3([assign, a], [assign, b], [assign, c]);
-  return a;
+function dsad(scp_program) {
+  genElStr5(
+  [fixed, scp_program], 
+  [assign, tmp_arc1], 
+  [fixed, target_scp_program], 
+  [assign, tmp_arc2], 
+  [assign, pattern_params]);
+  
+  sys_search(
+  [fixed, scp_syntax_error_missing_return_operator_pattern],
+  [assign, result],
+  [fixed, pattern_params]
+  );
+  
+  return result;
 }
       </textarea>
     </td>

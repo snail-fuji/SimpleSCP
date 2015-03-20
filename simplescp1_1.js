@@ -1,3 +1,4 @@
+//TODO Add defaults
 function Program(parameters, operators) {
   this.parameters = parameters || [];
   this.operators = operators || [];
