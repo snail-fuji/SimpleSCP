@@ -12,6 +12,9 @@ const simpleLanguageOperators = [
   "eraseElStr3",
   "eraseElStr5",
   "sys_search",
+  "print",
+  "printNl",
+  "printEl",
 ]
 const setLanguageOperators = [
   "searchSetStr3",

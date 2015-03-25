@@ -1,4 +1,5 @@
 //TODO Add defaults
+
 function Program(parameters, operators) {
   this.parameters = parameters || [];
   this.operators = operators || [];
@@ -12,7 +13,10 @@ function Program(parameters, operators) {
   	var operatorString = "-> rrel_operators: ... (*<br>";
 	  for(var i = 0; i < this.operators.length; i++) {
 	    var operator = operators[i];
-	    operatorString += "-> " + operator.toString() + "<br>";
+      operatorString += "-> ";
+      if (i == 0) 
+        operatorString += "rrel_init: ";
+	    operatorString += operator.toString() + "<br>";
 	  }
     operatorString += "*);;<br>";
 	  return operatorString;
