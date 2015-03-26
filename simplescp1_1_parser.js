@@ -108,6 +108,7 @@ function parseBlockStatement(block, parameters) {
 }
 
 function parseIfStatement(condition, parameters) {
+  //TODO add empty operator
   /*var test = parseExpressionStatement(condition["test"])[0];
   var consequent = parseStatement(condition["consequent"]);
   var alternate = [];
@@ -182,14 +183,23 @@ function parseSetArguments(argumentArray) {
   return arguments;
 }
 
+function preprocessArgument(argument) {
+  //if (argument.indexOf(fixed) == -1) argument.unshift(assign);
+  //if (argument.indexOf(scp_const) == -1) argument.unshift(scp_var);
+}
+
 function parseArgument(argument) {
+  //preprocessArgument(argument);
   if (argument.length != 0) {
     var element = argument[0]; 
     argument.splice(0, 1);
     if (isModifier(element["name"])) {
       return new ArgumentDecorator(element["name"], parseArgument(argument));
     }
-    return new VariableArgument(element["name"]);
+    else if (isVariable(element["name"]))
+      return new VariableArgument(element["name"]);
+    else 
+      return new ConstantArgument(element["name"]);
   }
 }
 
@@ -203,4 +213,8 @@ function isSetLanguageOperator(languageOperator) {
 
 function isModifier(modifier) {
   return (modifiers.indexOf(modifier) != -1) 
+}
+
+function isVariable(name) {
+  return (name[0] == "_");
 }

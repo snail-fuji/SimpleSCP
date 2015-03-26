@@ -79,7 +79,7 @@ VariableArgument.prototype = Argument;
 function VariableArgument(name) {
   this.identifier = name;
   this.toString = function() {
-    return "rrel_scp_var: " + this.identifier;
+    return "rrel_scp_var: _" + this.identifier;
   }
 }
 
@@ -87,7 +87,7 @@ ConstantArgument.prototype = Argument;
 function ConstantArgument(name) {
   this.identifier = name;
   this.toString = function() {
-    return "rrel_scp_const: " + this.identifier;
+    return "rrel_scp_const: rrel_fixed: " + this.identifier;
   }
 }
 
