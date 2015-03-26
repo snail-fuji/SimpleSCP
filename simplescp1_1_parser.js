@@ -101,22 +101,20 @@ function parseBlockStatement(block, parameters) {
     if (temporaryOperators) {
       if (operators.length > 0) 
         operators[operators.length - 1].transition = new LinearTransition(temporaryOperators[0]);
-      //TODO just concat
-      for(var j = 0; j < temporaryOperators.length; j++) 
-        operators.push(temporaryOperators[j]); 
+      operators = operators.concat(temporaryOperators);
     }
   }
   return operators;
 }
 
 function parseIfStatement(condition, parameters) {
-  //test = parseExpressionStatement(condition["test"])[0];
-  //consequent = parseStatement(condition["consequent"]);
-  //alternate = parseStatement(condition[""]);
-  //alert(new ConditionalTransition(consequent[0], consequent[0]));
-  //test.transition = new ConditionalTransition(consequent[0], consequent[0]);
-  //alert(test.transition);
-  //return [test];
+  /*var test = parseExpressionStatement(condition["test"])[0];
+  var consequent = parseStatement(condition["consequent"]);
+  var alternate = [];
+  if (condition["alternate"] != null) 
+    alternate = parseStatement(condition["alternate"]);
+  test.transition = new ConditionalTransition(consequent[0], alternate[0]);
+  return [test].concat(consequent, alternate);*/
 }
 
 //TODO add switch block
