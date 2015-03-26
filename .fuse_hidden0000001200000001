@@ -3,8 +3,6 @@
 function Program(parameters, operators) {
   this.parameters = parameters || [];
   this.operators = operators || [];
-  for(var i = 0; i < this.operators.length; i++) 
-    this.operators[i].id = i + 1;
   this.toString = function() {
   	return "scp_program -> " + this.getName() + " (*<br>" + this.getParameters() + this.getOperators() + "*);;";
   }
@@ -14,7 +12,8 @@ function Program(parameters, operators) {
   this.getOperators = function() {
   	var operatorString = "-> rrel_operators: ... (*<br>";
 	  for(var i = 0; i < this.operators.length; i++) {
-	    var operator = this.operators[i];
+	    var operator = operators[i];
+      operator.id = i + 1;
       operatorString += "-> ";
       if (i == 0) 
         operatorString += "rrel_init: ";
@@ -26,7 +25,7 @@ function Program(parameters, operators) {
   this.getParameters = function() {
     var parameterString = "-> rrel_params: ... (*<br>";
     for(var i = 0; i < this.parameters.length; i++) {
-      var parameter = this.parameters[i];
+      var parameter = parameters[i];
       parameterString += "-> " + parameter.toString() + ";;<br>";
     }
     parameterString += "*);;<br>";

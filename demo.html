@@ -1,15 +1,26 @@
-<script src="esprima.js"></script>
-<script src="simplescp1_1.js"></script>
-<script src="simplescp1_1_parser.js"></script>
-<script>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="esprima.js"></script>
+    <script src="simplescp1_1.js"></script>
+    <script src="simplescp1_1_parser.js"></script>
+    <script>
+    /*operator1 = new Operator("foo", [], new LinearTransition());
+    operator2 = new Operator("bar", [], new LinearTransition(operator1));
+    operators = [operator1];
+    operators2 = [].concat(operators);
+    operators2[0].id = 1;
+    alert(operator2);*/
 function startParser() {
   document.getElementById("program").innerHTML = parse(document.getElementById("source").value);
 }
-</script>
-<table>
-  <tr>
-    <td>
-      <textarea id="source" rows = "30" cols="80" onkeydown="startParser()">
+    </script>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td>
+          <textarea id="source" rows = "30" cols="80" onkeydown="startParser()">
 function dsad(scp_program) {
   genElStr5(
   [fixed, scp_program], 
@@ -26,10 +37,12 @@ function dsad(scp_program) {
   
   return result;
 }
-      </textarea>
-    </td>
-    <td>
-    <div id="program"></div>
-    </td>
-  </tr>
-</table>
+          </textarea>
+        </td>
+        <td>
+        <div id="program"></div>
+        </td>
+      </tr>
+    </table>  
+  </body>
+</html>

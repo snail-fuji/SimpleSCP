@@ -37,7 +37,11 @@ const modifiers = [
 ]
 function parse(code) {
   syntax = esprima.parse(code);
-  return parseFunction(syntax["body"][0]).toString();
+  return format(parseFunction(syntax["body"][0]).toString());
+}
+
+function format(string) {
+  return string.split(' ').join('&nbsp;');
 }
 
 function parseFunction(syntax) {
@@ -97,6 +101,7 @@ function parseBlockStatement(block, parameters) {
     if (temporaryOperators) {
       if (operators.length > 0) 
         operators[operators.length - 1].transition = new LinearTransition(temporaryOperators[0]);
+      //TODO just concat
       for(var j = 0; j < temporaryOperators.length; j++) 
         operators.push(temporaryOperators[j]); 
     }
