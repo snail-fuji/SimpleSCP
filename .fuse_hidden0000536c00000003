@@ -195,7 +195,7 @@ function parseArgument(argument) {
     var element = argument[0]; 
     argument.splice(0, 1);
     if (isLiteral(element))
-      return new ArgumentDecorator("fixed", new LiteralArgument(element["value"]));
+      return new LinkArgument(element["value"]);
     else if (isModifier(element["name"]))
       return new ArgumentDecorator(element["name"], parseArgument(argument));
     else if (isVariable(element["name"]))
@@ -219,8 +219,4 @@ function isModifier(modifier) {
 
 function isVariable(name) {
   return (name[0] == "_");
-}
-
-function isLiteral(element) {
-  return (element.type == "Literal");
 }

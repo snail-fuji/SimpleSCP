@@ -83,6 +83,14 @@ function VariableArgument(name) {
   }
 }
 
+LiteralArgument.prototype = Argument;
+function LiteralArgument(name) {
+  this.identifier = name;
+  this.toString = function() {
+    return "rrel_scp_const: [" + this.identifier + "]";
+  }
+}
+
 ConstantArgument.prototype = Argument;
 function ConstantArgument(name) {
   this.identifier = name;
