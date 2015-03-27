@@ -108,14 +108,24 @@ function parseBlockStatement(block, parameters) {
 }
 
 function parseIfStatement(condition, parameters) {
-  //TODO add empty operator
-  /*var test = parseExpressionStatement(condition["test"])[0];
+  //TODO add case if alternate is empty
+  var test = parseExpressionStatement(condition["test"])[0];
   var consequent = parseStatement(condition["consequent"]);
   var alternate = [];
   if (condition["alternate"] != null) 
     alternate = parseStatement(condition["alternate"]);
-  test.transition = new ConditionalTransition(consequent[0], alternate[0]);
-  return [test].concat(consequent, alternate);*/
+  var empty = new Operator("synchronize", [], new LinearTransition());
+  if (consequent.length != 0) 
+    consequent[consequent.length - 1].transition = new LinearTransition(empty);
+  if (alternate.length != 0)
+    alternate[alternate.length - 1].transition = new LinearTransition(empty);
+  if (alternate.length == 0)
+    test.transition = new ConditionalTransition(consequent[0], empty);
+  else
+    test.transition = new ConditionalTransition(consequent[0], alternate[0]);
+  var operatorArray = [test].concat(consequent, alternate);
+  operatorArray.push(empty);
+  return operatorArray;
 }
 
 //TODO add switch block
