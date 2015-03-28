@@ -59,7 +59,7 @@ function design(string) {
     if (line.search("\\(\\*") != -1) spaces += 2;
     index = string.search("<br>");
   }
-  alert(designedString);
+  designedString += string;
   return designedString;
 }
 
