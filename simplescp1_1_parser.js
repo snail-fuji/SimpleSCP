@@ -15,6 +15,7 @@ const simpleLanguageOperators = [
   "print",
   "printNl",
   "printEl",
+  "ifVarAssign",
 ]
 const setLanguageOperators = [
   "searchSetStr3",
@@ -37,11 +38,29 @@ const modifiers = [
 ]
 function parse(code) {
   syntax = esprima.parse(code);
-  return format(parseFunction(syntax["body"][0]).toString());
+  return format(design(parseFunction(syntax["body"][0]).toString()));
 }
 
 function format(string) {
   return string.split(' ').join('&nbsp;');
+}
+
+function design(string) {
+  spaces = 0;
+  index = string.search("<br>");
+  designedString = "";
+  while(index != -1) {
+    line = string.substr(0, index + 4);
+    string = string.substr(index + 4);
+    if (line.search("\\*\\)") != -1) spaces -= 2;
+    for(i = 0; i < spaces; i++)
+      designedString += " ";
+    designedString += line;
+    if (line.search("\\(\\*") != -1) spaces += 2;
+    index = string.search("<br>");
+  }
+  alert(designedString);
+  return designedString;
 }
 
 function parseFunction(syntax) {
@@ -110,19 +129,32 @@ function parseBlockStatement(block, parameters) {
 function parseIfStatement(condition, parameters) {
   //TODO add case if alternate is empty
   var test = parseExpressionStatement(condition["test"])[0];
-  var consequent = parseStatement(condition["consequent"]);
+  var consequent = [];
+  if (condition["consequent"] != null) 
+    consequent = parseStatement(condition["consequent"]);
   var alternate = [];
   if (condition["alternate"] != null) 
     alternate = parseStatement(condition["alternate"]);
   var empty = new Operator("synchronize", [], new LinearTransition());
   if (consequent.length != 0) 
     consequent[consequent.length - 1].transition = new LinearTransition(empty);
+  else
   if (alternate.length != 0)
     alternate[alternate.length - 1].transition = new LinearTransition(empty);
+  var thenOperator = consequent[0];
+  var elseOperator = alternate[0];
+  if(!thenOperator) thenOperator = empty;
+  if(!elseOperator) elseOperator = empty;
+  test.transition = new ConditionalTransition(thenOperator, elseOperator);
+  /*if (consequent.length == 0)
+    test.transition = new ConditionalTransition(consequent[0], empty);
+  else
+    test.transition = new ConditionalTransition(consequent[0], consequent[0]);
   if (alternate.length == 0)
     test.transition = new ConditionalTransition(consequent[0], empty);
   else
-    test.transition = new ConditionalTransition(consequent[0], alternate[0]);
+    test.transition = new ConditionalTransition(consequent[0], alternate[0]);*/
+
   var operatorArray = [test].concat(consequent, alternate);
   operatorArray.push(empty);
   return operatorArray;
@@ -160,8 +192,9 @@ function parseSetLanguageOperator(languageOperator) {
 function parseUserFunction(expression) {
   var name = new ArgumentDecorator(1, new ConstantArgument(expression["callee"]["name"]));
   var callArguments = new ArgumentDecorator(2, new ArgumentSet(parseArguments(expression["arguments"])));
-  var process_assign = new ArgumentDecorator(3, new ArgumentDecorator("assign", new VariableArgument("process")));
-  var process_fixed = new ArgumentDecorator(1, new ArgumentDecorator("fixed", new VariableArgument("process")));
+  var process = new VariableArgument("_process")
+  var process_assign = new ArgumentDecorator(3, new ArgumentDecorator("assign", process));
+  var process_fixed = new ArgumentDecorator(1, new ArgumentDecorator("fixed", process));
   var arguments = [name, callArguments, process_assign];
   var waiter = new Operator(waitReturn, [process_fixed], new LinearTransition());
   var caller = new Operator(call, arguments, new LinearTransition(waiter));
