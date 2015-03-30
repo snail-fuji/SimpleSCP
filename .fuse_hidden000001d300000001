@@ -97,32 +97,17 @@ function parseStatement(statement, parameterArray) {
       return parseIfStatement(statement, parameterArray);
     case "ForInStatement":
       return parseForInStatement(statement, parameterArray);
-    case "CallExpression":
-      return parseCallExpression(statement);
     case "ReturnStatement":
       var parameter = parseOutParameter(parameterArray.length + 1, statement["argument"]);
       parameterArray.push(parameter);
-      return [];
       break;
   }
-}
-
-function parseForInStatement(expression, parameterArray) {
-  //var iterator = [expression["left"]];
-  //var iterable = [expression["right"]];
-  var block = parseStatement(expression["body"], parameterArray);
-  //var empty = new Operator("print", [], new LinearTransition());
-  //var search = new Operator("searchElStr3", [iterable, iterable_arc, assign_iterator], new ConditionalTransition(block[0], empty));
-  //var erase = new Operator("eraseElStr3", [iterable, iterable_arc, fixed_iterator], new LinearTransition(search)); 
-  return block;
 }
 
 function parseExpressionStatement(expression) {
   switch(expression.type) {
     case "CallExpression":
       return parseCallExpression(expression);
-    case "ConditionalExpression":
-      return parseIfStatement(expression);
   }
 }
 
@@ -162,6 +147,15 @@ function parseIfStatement(condition, parameters) {
   if(!thenOperator) thenOperator = empty;
   if(!elseOperator) elseOperator = empty;
   test.transition = new ConditionalTransition(thenOperator, elseOperator);
+  /*if (consequent.length == 0)
+    test.transition = new ConditionalTransition(consequent[0], empty);
+  else
+    test.transition = new ConditionalTransition(consequent[0], consequent[0]);
+  if (alternate.length == 0)
+    test.transition = new ConditionalTransition(consequent[0], empty);
+  else
+    test.transition = new ConditionalTransition(consequent[0], alternate[0]);*/
+
   var operatorArray = [test].concat(consequent, alternate);
   operatorArray.push(empty);
   return operatorArray;
