@@ -1,5 +1,3 @@
-//TODO Add defaults
-
 function Program(parameters, operators) {
   this.parameters = parameters || [];
   this.operators = operators || [];
@@ -34,11 +32,16 @@ function Program(parameters, operators) {
   }
 }
 
-function Operator(type, arguments, transition) {
+function Operator() {
   this.id = Math.floor(Math.random()*65536);
-  this.type = type
-  this.arguments = arguments;
-  this.transition = transition;
+}
+
+function BasicOperator(type) {
+  Operator.call(this);
+  this.type = type;
+  this.setTransition = function(transition) {
+    this.transition = transition;
+  }
   this.toString = function() {
     return this.getName() + " (*<br>" + this.getType() + this.getArguments() + this.transition.toString() + "*);;";
   }
@@ -46,15 +49,77 @@ function Operator(type, arguments, transition) {
     return "<- " + this.type + ";;<br>";
   }
   this.getArguments = function() {
-  	var argumentString = "";
-	  for(var i = 0; i < this.arguments.length; i++) {
+    var argumentString = "";
+    for(var i = 0; i < this.arguments.length; i++) {
       var argument = this.arguments[i];
-	    argumentString += "-> " + argument.toString() + ";;<br>";
-	  }
-	  return argumentString;
+      argumentString += "-> " + argument.toString() + ";;<br>";
+    }
+    return argumentString;
   }
   this.getName = function() {
-  	return "..operator" + this.id;
+    return "..operator" + this.id;
+  }
+}
+
+function SimpleOperator(type, arguments) {
+  BasicOperator.call(this, type);
+  this.setArguments = function(arguments) {
+    this.arguments = [];
+    for(var i = 0; i < arguments.length; i++) {
+      this.arguments.push(new NumberArgumentDecorator(i, arguments[i]));
+    }
+  }
+  this.setArguments(arguments);
+}
+
+function SetOperator(type, arguments) {
+  BasicOperator.call(this, type);
+  this.setArguments = function(arguments) {
+    this.arguments = [];
+    for(var i = 0; i < arguments.length; i++) {
+      var argument = arguments[i];
+      if (i < arguments.length / 2)
+        this.arguments.push(new NumberArgumentDecorator((i + 1), arguments));
+      else 
+        this.arguments.push(new NumberSetArgumentDecorator(i + 1 - argumentArray.length / 2, arguments));
+  }
+  this.setArguments(arguments); 
+}
+
+function ComplicatedOperator(operators) {
+  Operator.call(this);
+  this.operators = operators;
+  this.toString = function() {
+    var body = "";
+    for(var i = 0; i < this.operators.length; i++) {
+      var operator = this.operators[i];
+      body += operator.toString() + "<br>";
+    }
+  }
+}
+
+function BlockOperator(operators) {
+  ComplicatedOperator.call(this, operators);
+  this.setTransition = function(transition) {
+    this.operators[this.operators.length - 1].setTransition(transition);
+  }
+}
+
+function IfOperator(testOperator, thenOperator, elseOperator) {
+  ComplicatedOperator.call(this, [testOperator, thenOperator, elseOperator]);
+  //TODO add transition to test operator
+  this.operators[0].setTransition(new ConditionalTransition(thenOperator, elseOperator));
+  this.setTransition = function(transition) {
+    this.operators[1].setTransition(transition);
+    this.operators[2].setTransition(transition);
+  }
+}
+
+function WhileOperator(testOperator, loopOperator) {
+  ComplicatedOperator.call(this, [testOperator, loopOperator]);
+  this.operators[0].setTransition(new ConditionalTransition(loopOperator));
+  this.setTransition = function(transition) {
+    this.operators[1].setTransition(transition);
   }
 }
 
@@ -75,38 +140,26 @@ function ArgumentSet(arguments) {
   }
 }
 
-VariableArgument.prototype = Argument;
-function VariableArgument(name) {
-  this.identifier = name;
+function SimpleArgument(name) {
+  Argument.call(this, name);
   this.toString = function() {
-    return "rrel_scp_var: " + this.identifier;
+    return this.identifier;
   }
 }
 
-LiteralArgument.prototype = Argument;
-function LiteralArgument(name) {
-  this.identifier = name;
-  this.toString = function() {
-    return "rrel_scp_const: " + this.identifier;
-  }
+function RandomArgument() {
+  SimpleArgument.call(this, "argument" + Math.floor(Math.random()*65536));
 }
 
-ConstantArgument.prototype = Argument;
-function ConstantArgument(name) {
-  this.identifier = name;
-  this.toString = function() {
-    return "rrel_scp_const: " + this.identifier;
-  }
-}
-
-ArgumentDecorator.prototype = Argument;
 function ArgumentDecorator(name, argument) {
-  this.identifier = name;
+  Argument.call(this, name);
   this.argument = argument;
   this.toString = function() {
     return "rrel_" + this.identifier + ": " + this.argument.toString();
   }
 }
+
+function FixedArgument(name, argument)
 
 function ConditionalTransition(thenOperator, elseOperator) {
   this.thenOperator = thenOperator;

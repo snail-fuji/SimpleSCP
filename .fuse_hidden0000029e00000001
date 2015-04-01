@@ -1,5 +1,3 @@
-//TODO Add defaults
-
 function Program(parameters, operators) {
   this.parameters = parameters || [];
   this.operators = operators || [];
@@ -34,11 +32,23 @@ function Program(parameters, operators) {
   }
 }
 
-function Operator(type, arguments, transition) {
+function Operator() {
   this.id = Math.floor(Math.random()*65536);
-  this.type = type
-  this.arguments = arguments;
-  this.transition = transition;
+}
+
+//SimpleOperator.prototype = Operator;
+function SimpleOperator(type, arguments) {
+  this = new Operator();
+  this.type = type;
+  this.setTransition = function(transition) {
+    this.transition = transition;
+  }
+  this.setArguments = function(arguments) {
+    this.arguments = [];
+    for(var i = 0; i < arguments.length; i++) {
+      this.arguments.push(new NumberArgumentDecorator(i, arguments[i]));
+    }
+  }
   this.toString = function() {
     return this.getName() + " (*<br>" + this.getType() + this.getArguments() + this.transition.toString() + "*);;";
   }
@@ -46,15 +56,67 @@ function Operator(type, arguments, transition) {
     return "<- " + this.type + ";;<br>";
   }
   this.getArguments = function() {
-  	var argumentString = "";
-	  for(var i = 0; i < this.arguments.length; i++) {
+    var argumentString = "";
+    for(var i = 0; i < this.arguments.length; i++) {
       var argument = this.arguments[i];
-	    argumentString += "-> " + argument.toString() + ";;<br>";
-	  }
-	  return argumentString;
+      argumentString += "-> " + argument.toString() + ";;<br>";
+    }
+    return argumentString;
   }
   this.getName = function() {
-  	return "..operator" + this.id;
+    return "..operator" + this.id;
+  }
+  this.setArguments(arguments);
+}
+
+function SetOperator(type, arguments) {
+  this = new Operator();
+  this.type = type;
+  this.setTransition = function(transition) {
+    this.transition = transition;
+  }
+  this.setArguments = function(arguments) {
+    this.arguments = [];
+    for(var i = 0; i < arguments.length; i++) {
+      var argument = arguments[i];
+      if (i < arguments.length / 2)
+        this.arguments.push(new NumberArgumentDecorator((i + 1), arguments));
+      else 
+        this.arguments.push(new NumberSetArgumentDecorator(i + 1 - argumentArray.length / 2, arguments));
+  }
+  this.toString = function() {
+    return this.getName() + " (*<br>" + this.getType() + this.getArguments() + this.transition.toString() + "*);;";
+  }
+  this.getType = function() {
+    return "<- " + this.type + ";;<br>";
+  }
+  this.getArguments = function() {
+    var argumentString = "";
+    for(var i = 0; i < this.arguments.length; i++) {
+      var argument = this.arguments[i];
+      argumentString += "-> " + argument.toString() + ";;<br>";
+    }
+    return argumentString;
+  }
+  this.getName = function() {
+    return "..operator" + this.id;
+  }
+  this.setArguments(arguments); 
+}
+
+function ComplicatedOperator(operators) {
+  this = new Operator();
+  this.operators = operators;
+  this.setArguments = function(arguments) {
+  }
+  this.setTransition = function(transition) {
+  } 
+  this.toString = function() {
+    body = "";
+    for(var i = 0; i < this.operators.length; i++) {
+      var operator = this.operators[i];
+      body += operator.toString() + "<br>";
+    }
   }
 }
 
@@ -75,27 +137,11 @@ function ArgumentSet(arguments) {
   }
 }
 
-VariableArgument.prototype = Argument;
-function VariableArgument(name) {
+JustArgument.prototype = Argument;
+function JustArgument(name) {
   this.identifier = name;
   this.toString = function() {
-    return "rrel_scp_var: " + this.identifier;
-  }
-}
-
-LiteralArgument.prototype = Argument;
-function LiteralArgument(name) {
-  this.identifier = name;
-  this.toString = function() {
-    return "rrel_scp_const: " + this.identifier;
-  }
-}
-
-ConstantArgument.prototype = Argument;
-function ConstantArgument(name) {
-  this.identifier = name;
-  this.toString = function() {
-    return "rrel_scp_const: " + this.identifier;
+    return this.identifier;
   }
 }
 

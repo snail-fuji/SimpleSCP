@@ -37,6 +37,8 @@ const modifiers = [
   "arc",
   "node",
   "erase",
+  "scp_var",
+  "scp_const",
 ]
 function parse(code) {
   syntax = esprima.parse(code);
@@ -70,7 +72,7 @@ function parseFunction(syntax) {
   for(var i = 0; i < syntax.params.length; i++) { 
     parameters.push(parseInParameter(i + 1, syntax.params[i]));
   }
-  var operators = parseBlockStatement(syntax["body"], parameters);
+  var operators = parseBlockStatement(syntax["body"]);
   var operator = new Operator("return", [], new LinearTransition());
   if (operators.length > 0) {
     operators[operators.length - 1].transition = new LinearTransition(operator);
@@ -99,21 +101,24 @@ function parseStatement(statement, parameterArray) {
       return parseForInStatement(statement, parameterArray);
     case "CallExpression":
       return parseCallExpression(statement);
-    case "ReturnStatement":
-      var parameter = parseOutParameter(parameterArray.length + 1, statement["argument"]);
-      parameterArray.push(parameter);
+    case "EmptyStatement":
       return [];
-      break;
+    //case "ReturnStatement":
+    //  var parameter = parseOutParameter(parameterArray.length + 1, statement["argument"]);
+    //  parameterArray.push(parameter);
+    //  return [];
+    //  break;
   }
 }
 
-function parseForInStatement(expression, parameterArray) {
-  //var iterator = [expression["left"]];
-  //var iterable = [expression["right"]];
+function parseForInStatement(expression) {
+  var iterator = parseArgument([expression["left"]]);
+  var iterable_arc = new ArgumentDecorator("assign", new VariableArgument("_iterable_arc"))
+  var iterable = parseArgument([expression["right"]]);
   var block = parseStatement(expression["body"], parameterArray);
-  //var empty = new Operator("print", [], new LinearTransition());
-  //var search = new Operator("searchElStr3", [iterable, iterable_arc, assign_iterator], new ConditionalTransition(block[0], empty));
-  //var erase = new Operator("eraseElStr3", [iterable, iterable_arc, fixed_iterator], new LinearTransition(search)); 
+  var empty = new Operator("print", [], new LinearTransition());
+  var search = new Operator("searchElStr3", [iterable, iterable_arc, assign_iterator], new ConditionalTransition(block[0], empty));
+  var erase = new Operator("eraseElStr3", [iterable, iterable_arc, fixed_iterator], new LinearTransition(search)); 
   return block;
 }
 
@@ -126,13 +131,17 @@ function parseExpressionStatement(expression) {
   }
 }
 
-function parseBlockStatement(block, parameters) {
+function parseWhileStatement(expression) {
+  
+}
+
+function parseBlockStatement(block) {
   var temporaryOperators;
   var operators = [];
   var body = block["body"];
   for(var i = 0; i < body.length; i++)
   {
-    temporaryOperators = parseStatement(body[i], parameters);
+    temporaryOperators = parseStatement(body[i]);
     if (temporaryOperators) {
       if (operators.length > 0) 
         operators[operators.length - 1].transition = new LinearTransition(temporaryOperators[0]);
@@ -142,8 +151,8 @@ function parseBlockStatement(block, parameters) {
   return operators;
 }
 
-function parseIfStatement(condition, parameters) {
-  //TODO add case if alternate is empty
+function parseIfStatement(condition) {
+
   var test = parseExpressionStatement(condition["test"])[0];
   var consequent = [];
   if (condition["consequent"] != null) 
@@ -151,7 +160,7 @@ function parseIfStatement(condition, parameters) {
   var alternate = [];
   if (condition["alternate"] != null) 
     alternate = parseStatement(condition["alternate"]);
-  var empty = new Operator("synchronize", [], new LinearTransition());
+  var empty = new Operator("print", [new ArgumentDecorator("1", new ArgumentDecorator("fixed", new LiteralArgument("[...]")))], new LinearTransition());
   if (consequent.length != 0) 
     consequent[consequent.length - 1].transition = new LinearTransition(empty);
   else
@@ -197,7 +206,7 @@ function parseSetLanguageOperator(languageOperator) {
 }
 
 function parseUserFunction(expression) {
-  var name = new ArgumentDecorator(1, new ConstantArgument(expression["callee"]["name"]));
+  var name = new ArgumentDecorator(1, new ArgumentDecorator("fixed", new ConstantArgument(expression["callee"]["name"])));
   var callArguments = new ArgumentDecorator(2, new ArgumentSet(parseArguments(expression["arguments"])));
   var process = new VariableArgument("_process")
   var process_assign = new ArgumentDecorator(3, new ArgumentDecorator("assign", process));
@@ -234,25 +243,48 @@ function parseSetArguments(argumentArray) {
 }
 
 //TODO preprocessing
+
+function processArgument(argument) {
+  var argumentObject;
+  for(var i = argument.length - 1; i >=  0; i--) {
+    var element = argument[i]; 
+    if (isLiteral(element))
+      argumentObject = new ArgumentDecorator("fixed", new LiteralArgument(element));
+    else if (isModifier(element)) 
+      argumentObject = new ArgumentDecorator(element, argumentObject);
+    else if (isVariable(element)) 
+      argumentObject = new VariableArgument(element);
+    else 
+      argumentObject =new ConstantArgument(element);
+  }
+  return argumentObject;
+}
+
 function preprocessArgument(argument) {
-  //if (argument.indexOf(fixed) == -1) argument.unshift(assign);
-  //if (argument.indexOf(scp_const) == -1) argument.unshift(scp_var);
+  var preprocessedArgument = [];
+  for(var i = 0; i < argument.length; i++) {
+    if(argument[i].type == "Identifier")
+      preprocessedArgument.push(argument[i]["name"]);
+    else
+      preprocessedArgument.push("[" + argument[i]["value"] + "]");
+  }
+  argumentName = preprocessedArgument[preprocessedArgument.length - 1];
+  if (preprocessedArgument.indexOf("scp_const") == -1 && preprocessedArgument.indexOf("scp_var") == -1) {
+    if (isVariable(argumentName)) {
+      preprocessedArgument.unshift("scp_var");
+      if (preprocessedArgument.indexOf("fixed") == -1 && preprocessedArgument.indexOf("assign") == -1)
+        preprocessedArgument.unshift("assign");
+    }
+    else {
+      preprocessedArgument.unshift("scp_const");
+      preprocessedArgument.unshift("fixed");
+    }
+  }
+  return preprocessedArgument;
 }
 
 function parseArgument(argument) {
-  //preprocessArgument(argument);
-  if (argument.length != 0) {
-    var element = argument[0]; 
-    argument.splice(0, 1);
-    if (isLiteral(element))
-      return new ArgumentDecorator("fixed", new LiteralArgument(element["value"]));
-    else if (isModifier(element["name"]))
-      return new ArgumentDecorator(element["name"], parseArgument(argument));
-    else if (isVariable(element["name"]))
-      return new VariableArgument(element["name"]);
-    else 
-      return new ConstantArgument(element["name"]);
-  }
+  return processArgument(preprocessArgument(argument));
 }
 
 function isSimpleLanguageOperator(languageOperator) {
@@ -271,6 +303,7 @@ function isVariable(name) {
   return (name[0] == "_");
 }
 
-function isLiteral(element) {
-  return (element.type == "Literal");
+function isLiteral(name) {
+  //return (element.type == "Literal");
+  return (name[0] == "[");
 }

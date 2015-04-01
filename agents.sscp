@@ -1,0 +1,73 @@
+/*
+function proc_search_canonical_error(_scp_program, _scp_error) {
+
+  genSetStr5(
+    [fixed, _scp_error],
+    [assign, _tmp_arc1],
+    [assign, _pattern],
+    [assign, _tmp_arc2],
+    [fixed, nrel_scp_error_pattern],
+    [], [],
+    [assign, _patterns],
+    [], []
+  );
+  
+  searchElStr3([fixed, _patterns], [assign, _tmp_arc], [assign, _pattern]);
+  
+  sys_search(
+    [fixed, _pattern],
+    [assign, _result],
+    [fixed, pattern_params],
+    [assign, empty_set]
+  );
+  
+  if(ifVarAssign([_result]))
+    proc_generate_scp_error([fixed, _scp_program], [fixed, _scp_error]);
+  
+  
+  eraseEl([fixed, erase, _tmp_arc]);
+}
+*/ 
+
+/*
+function proc_search_canonical_errors(_scp_program) {
+  searchSetStr3(
+    [fixed, scp_canonical_error], [assign, _tmp_arc], [assign, _error],
+    [], [], [assign, _errors]
+  );
+  
+  searchElStr3([fixed, _errors], [assign, _tmp_arc], [assign, _error]);
+
+  proc_search_canonical_error([fixed, _scp_program], [fixed, _error]);
+
+  eraseEl([fixed, _tmp_arc]);
+}        
+*/
+
+/*
+function proc_search_non_canonical_errors(_scp_program) {
+  searchSetStr3(
+    [fixed, scp_canonical_error], [assign, _tmp_arc], [assign, _error],
+    [], [], [assign, _errors]
+  );
+  
+  searchElStr3([fixed, _errors], [assign, _tmp_arc], [assign, _error]);
+
+  proc_search_non_canonical_error([fixed, _scp_program], [fixed, _error]);
+
+  eraseEl([fixed, _tmp_arc]);
+}
+*/
+
+/*
+function proc_search_non_canonical_error(_scp_program, _error) {
+  searchElStr5(
+    [fixed, _error], 
+    [assign, _tmp_arc1], 
+    [assign, _program],
+    [assign, _tmp_arc2],
+    [fixed, nrel_scp_error_program]);
+
+  _program([fixed, _scp_program], [fixed, _error]);
+}
+*/
