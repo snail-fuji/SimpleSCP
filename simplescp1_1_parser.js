@@ -82,12 +82,12 @@ function parseFunction(syntax) {
 }
 
 function parseInParameter(number, parameter) {
-  return new ArgumentDecorator(number, new ArgumentDecorator("fixed", new ArgumentDecorator("in", new VariableArgument(parameter["name"]))));
+  return new ArgumentDecorator(number, new ArgumentDecorator("scp_var", new ArgumentDecorator("fixed", new ArgumentDecorator("in", new VariableArgument(parameter["name"])))));
 }
 
-function parseOutParameter(number, parameter) {
+/*function parseOutParameter(number, parameter) {
   return new ArgumentDecorator(number, new ArgumentDecorator("out", new ArgumentDecorator("assign", new VariableArgument(parameter["name"]))));
-}
+}*/
 
 function parseStatement(statement) {
   switch(statement["type"]) {
