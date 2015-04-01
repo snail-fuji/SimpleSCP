@@ -89,20 +89,22 @@ function parseOutParameter(number, parameter) {
   return new ArgumentDecorator(number, new ArgumentDecorator("out", new ArgumentDecorator("assign", new VariableArgument(parameter["name"]))));
 }
 
-function parseStatement(statement, parameterArray) {
+function parseStatement(statement) {
   switch(statement["type"]) {
     case "ExpressionStatement":
       return parseExpressionStatement(statement["expression"]);
     case "BlockStatement":
-      return parseBlockStatement(statement, parameterArray);
+      return parseBlockStatement(statement);
     case "IfStatement":
-      return parseIfStatement(statement, parameterArray);
-    case "ForInStatement":
-      return parseForInStatement(statement, parameterArray);
+      return parseIfStatement(statement);
+    /*case "ForInStatement":
+      return parseForInStatement(statement);*/
     case "CallExpression":
       return parseCallExpression(statement);
     case "EmptyStatement":
       return [];
+    case "WhileStatement":
+      return parseWhileStatement(statement);
     //case "ReturnStatement":
     //  var parameter = parseOutParameter(parameterArray.length + 1, statement["argument"]);
     //  parameterArray.push(parameter);
@@ -131,10 +133,6 @@ function parseExpressionStatement(expression) {
   }
 }
 
-function parseWhileStatement(expression) {
-  
-}
-
 function parseBlockStatement(block) {
   var temporaryOperators;
   var operators = [];
@@ -152,7 +150,6 @@ function parseBlockStatement(block) {
 }
 
 function parseIfStatement(condition) {
-
   var test = parseExpressionStatement(condition["test"])[0];
   var consequent = [];
   if (condition["consequent"] != null) 
@@ -172,6 +169,21 @@ function parseIfStatement(condition) {
   if(!elseOperator) elseOperator = empty;
   test.transition = new ConditionalTransition(thenOperator, elseOperator);
   var operatorArray = [test].concat(consequent, alternate);
+  operatorArray.push(empty);
+  return operatorArray;
+}
+
+function parseWhileStatement(loop) {
+  var test = parseExpressionStatement(loop["test"])[0];
+  var body = parseStatement(loop["body"]);
+  var empty = new Operator("print", [new ArgumentDecorator("1", new ArgumentDecorator("fixed", new LiteralArgument("[...]")))], new LinearTransition());
+  var nextOperator = body[0];
+  var lastOperator = body[body.length - 1];
+  if (!nextOperator) nextOperator = empty;
+  if (!lastOperator) lastOperator = empty;
+  test.transition = new ConditionalTransition(nextOperator, empty);
+  lastOperator.transition = new LinearTransition(test);
+  var operatorArray = [test].concat(body);
   operatorArray.push(empty);
   return operatorArray;
 }
