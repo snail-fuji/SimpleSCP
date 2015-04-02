@@ -159,8 +159,6 @@ function ArgumentDecorator(name, argument) {
   }
 }
 
-function FixedArgument(name, argument)
-
 function ConditionalTransition(thenOperator, elseOperator) {
   this.thenOperator = thenOperator;
   this.elseOperator = elseOperator;
@@ -179,4 +177,8 @@ function LinearTransition(nextOperator) {
     if (nextOperator) body = "=> nrel_goto: " + this.nextOperator.getName() + ";;<br>";
     return body;
   }
+}
+
+function test() {
+  alert(new SimpleOperator("lol", []));
 }

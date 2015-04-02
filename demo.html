@@ -5,12 +5,6 @@
     <script src="simplescp1_1.js"></script>
     <script src="simplescp1_1_parser.js"></script>
     <script>
-    /*operator1 = new Operator("foo", [], new LinearTransition());
-    operator2 = new Operator("bar", [], new LinearTransition(operator1));
-    operators = [operator1];
-    operators2 = [].concat(operators);
-    operators2[0].id = 1;
-    alert(operator2);*/
 function startParser() {
   document.getElementById("program").innerHTML = parse(document.getElementById("source").value);
 }
@@ -21,11 +15,11 @@ function startParser() {
       <tr>
         <td>
           <textarea id="source" rows = "30" cols="80" onkeydown="startParser()">
-function dsad(_set) {
+function example(_set) {
   while(searchElStr3([fixed, _set], [_arc], [_node])){
     printEl([fixed, _node]);
     proc_of_some_actions([_fixed, _node]);
-    eraseEl([fixed, _arc]);
+    eraseEl([fixed, erase, _arc]);
   }
 }
           </textarea>

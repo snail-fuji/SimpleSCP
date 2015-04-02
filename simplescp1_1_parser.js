@@ -220,7 +220,7 @@ function parseSetLanguageOperator(languageOperator) {
 function parseUserFunction(expression) {
   var name = new ArgumentDecorator(1, new ArgumentDecorator("fixed", new ConstantArgument(expression["callee"]["name"])));
   var callArguments = new ArgumentDecorator(2, new ArgumentSet(parseArguments(expression["arguments"])));
-  var process = new VariableArgument("_process")
+  var process = new ArgumentDecorator("scp_var", new VariableArgument("_process"));
   var process_assign = new ArgumentDecorator(3, new ArgumentDecorator("assign", process));
   var process_fixed = new ArgumentDecorator(1, new ArgumentDecorator("fixed", process));
   var arguments = [name, callArguments, process_assign];
