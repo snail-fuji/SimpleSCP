@@ -180,5 +180,5 @@ function LinearTransition(nextOperator) {
 }
 
 function test() {
-  alert(new SimpleOperator("lol", []));
+  //alert(new SimpleOperator("lol", []));
 }

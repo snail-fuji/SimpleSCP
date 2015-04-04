@@ -75,7 +75,7 @@ function ArgumentSet(arguments) {
   }
 }
 
-VariableArgument.prototype = Argument;
+/*VariableArgument.prototype = Argument;
 function VariableArgument(name) {
   this.identifier = name;
   this.toString = function() {
@@ -93,6 +93,14 @@ function LiteralArgument(name) {
 
 ConstantArgument.prototype = Argument;
 function ConstantArgument(name) {
+  this.identifier = name;
+  this.toString = function() {
+    return this.identifier;
+  }
+}*/
+
+SimpleArgument.prototype = Argument;
+function SimpleArgument(name) {
   this.identifier = name;
   this.toString = function() {
     return this.identifier;

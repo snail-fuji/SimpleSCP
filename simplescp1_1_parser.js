@@ -82,7 +82,7 @@ function parseFunction(syntax) {
 }
 
 function parseInParameter(number, parameter) {
-  return new ArgumentDecorator(number, new ArgumentDecorator("in", new VariableArgument(parameter["name"])));
+  return new ArgumentDecorator(number, new ArgumentDecorator("in", new SimpleArgument(parameter["name"])));
 }
 
 /*function parseOutParameter(number, parameter) {
@@ -109,14 +109,14 @@ function parseStatement(statement) {
 }
 
 function parseForInStatement(expression) {
-  var iterator = parseArgument([expression["left"]]);
-  var iterable_arc = new ArgumentDecorator("assign", new VariableArgument("_iterable_arc"))
+  /*var iterator = parseArgument([expression["left"]]);
+  var iterable_arc = new ArgumentDecorator("assign", new SimpleArgument("_iterable_arc"))
   var iterable = parseArgument([expression["right"]]);
   var block = parseStatement(expression["body"], parameterArray);
   var empty = new Operator("print", [], new LinearTransition());
   var search = new Operator("searchElStr3", [iterable, iterable_arc, assign_iterator], new ConditionalTransition(block[0], empty));
   var erase = new Operator("eraseElStr3", [iterable, iterable_arc, fixed_iterator], new LinearTransition(search)); 
-  return block;
+  return block;*/
 }
 
 function parseExpressionStatement(expression) {
@@ -152,7 +152,7 @@ function parseIfStatement(condition) {
   var alternate = [];
   if (condition["alternate"] != null) 
     alternate = parseStatement(condition["alternate"]);
-  var empty = new Operator("print", [new ArgumentDecorator("1", new ArgumentDecorator("scp_const", new ArgumentDecorator("fixed", new LiteralArgument("[...]"))))], new LinearTransition());
+  var empty = new Operator("print", [new ArgumentDecorator("1", new ArgumentDecorator("scp_const", new ArgumentDecorator("fixed", new SimpleArgument("[...]"))))], new LinearTransition());
   if (consequent.length != 0) 
     consequent[consequent.length - 1].transition = new LinearTransition(empty);
   else
@@ -171,7 +171,7 @@ function parseIfStatement(condition) {
 function parseWhileStatement(loop) {
   var test = parseExpressionStatement(loop["test"])[0];
   var body = parseStatement(loop["body"]);
-  var empty = new Operator("print", [new ArgumentDecorator("1", new ArgumentDecorator("scp_const", new ArgumentDecorator("fixed", new LiteralArgument("[...]"))))], new LinearTransition());
+  var empty = new Operator("print", [new ArgumentDecorator("1", new ArgumentDecorator("scp_const", new ArgumentDecorator("fixed", new SimpleArgument("[...]"))))], new LinearTransition());
   var nextOperator = body[0];
   var lastOperator = body[body.length - 1];
   if (!nextOperator) nextOperator = empty;
@@ -213,11 +213,13 @@ function parseSetLanguageOperator(languageOperator) {
 }
 
 function parseUserFunction(expression) {
-  var name = new ArgumentDecorator(1, new ArgumentDecorator("fixed", new ConstantArgument(expression["callee"]["name"])));
+  var name = new ArgumentDecorator(1, processArgument(preprocessArgument([expression["callee"]["name"]])));
   var callArguments = new ArgumentDecorator(2, new ArgumentSet(parseArguments(expression["arguments"])));
-  var process = new ArgumentDecorator("scp_var", new VariableArgument("_process"));
-  var process_assign = new ArgumentDecorator(3, new ArgumentDecorator("assign", process));
-  var process_fixed = new ArgumentDecorator(1, new ArgumentDecorator("fixed", process));
+  //var process = new ArgumentDecorator("scp_var", new SimpleArgument("_process"));
+  var process_assign = new ArgumentDecorator(3, processArgument(preprocessArgument(["assign", "_process"])));
+  var process_fixed = new ArgumentDecorator(1, processArgument(preprocessArgument(["_process"])));
+  //var process_assign = new ArgumentDecorator(3, new ArgumentDecorator("assign", process));
+  //var process_fixed = new ArgumentDecorator(1, new ArgumentDecorator("fixed", process));
   var arguments = [name, callArguments, process_assign];
   var waiter = new Operator(waitReturn, [process_fixed], new LinearTransition());
   var caller = new Operator(call, arguments, new LinearTransition(waiter));
@@ -249,25 +251,7 @@ function parseSetArguments(argumentArray) {
   return arguments;
 }
 
-//TODO preprocessing
-
-function processArgument(argument) {
-  var argumentObject;
-  for(var i = argument.length - 1; i >=  0; i--) {
-    var element = argument[i]; 
-    if (isLiteral(element))
-      argumentObject = new ArgumentDecorator("fixed", new LiteralArgument(element));
-    else if (isModifier(element)) 
-      argumentObject = new ArgumentDecorator(element, argumentObject);
-    else if (isVariable(element)) 
-      argumentObject = new VariableArgument(element);
-    else 
-      argumentObject = new ConstantArgument(element);
-  }
-  return argumentObject;
-}
-
-function preprocessArgument(argument) {
+function convertArgument(argument) {
   var preprocessedArgument = [];
   for(var i = 0; i < argument.length; i++) {
     if(argument[i].type == "Identifier")
@@ -275,12 +259,31 @@ function preprocessArgument(argument) {
     else
       preprocessedArgument.push("[" + argument[i]["value"] + "]");
   }
+  return preprocessedArgument;
+}
+
+function processArgument(argument) {
+  var argumentObject;
+  for(var i = argument.length - 1; i >=  0; i--) {
+    var element = argument[i]; 
+    //if (isLiteral(element))
+    //  argumentObject = new ArgumentDecorator("fixed", new LiteralArgument(element));
+    if (isModifier(element)) 
+      argumentObject = new ArgumentDecorator(element, argumentObject);
+    else 
+      argumentObject = new SimpleArgument(element);
+  }
+  return argumentObject;
+}
+
+function preprocessArgument(argument) {
+  var preprocessedArgument = argument;
   argumentName = preprocessedArgument[preprocessedArgument.length - 1];
   if (preprocessedArgument.indexOf("scp_const") == -1 && preprocessedArgument.indexOf("scp_var") == -1) {
     if (isVariable(argumentName)) {
       preprocessedArgument.unshift("scp_var");
       if (preprocessedArgument.indexOf("fixed") == -1 && preprocessedArgument.indexOf("assign") == -1)
-        preprocessedArgument.unshift("assign");
+        preprocessedArgument.unshift("fixed");
     }
     else {
       preprocessedArgument.unshift("scp_const");
@@ -291,7 +294,7 @@ function preprocessArgument(argument) {
 }
 
 function parseArgument(argument) {
-  return processArgument(preprocessArgument(argument));
+  return processArgument(preprocessArgument(convertArgument(argument)));
 }
 
 function isSimpleLanguageOperator(languageOperator) {
