@@ -82,7 +82,7 @@ function parseFunction(syntax) {
 }
 
 function parseInParameter(number, parameter) {
-  return new ArgumentDecorator(number, new ArgumentDecorator("scp_var", new ArgumentDecorator("fixed", new ArgumentDecorator("in", new VariableArgument(parameter["name"])))));
+  return new ArgumentDecorator(number, new ArgumentDecorator("in", new VariableArgument(parameter["name"])));
 }
 
 /*function parseOutParameter(number, parameter) {
@@ -105,11 +105,6 @@ function parseStatement(statement) {
       return [];
     case "WhileStatement":
       return parseWhileStatement(statement);
-    //case "ReturnStatement":
-    //  var parameter = parseOutParameter(parameterArray.length + 1, statement["argument"]);
-    //  parameterArray.push(parameter);
-    //  return [];
-    //  break;
   }
 }
 
@@ -157,7 +152,7 @@ function parseIfStatement(condition) {
   var alternate = [];
   if (condition["alternate"] != null) 
     alternate = parseStatement(condition["alternate"]);
-  var empty = new Operator("print", [new ArgumentDecorator("1", new ArgumentDecorator("fixed", new LiteralArgument("[...]")))], new LinearTransition());
+  var empty = new Operator("print", [new ArgumentDecorator("1", new ArgumentDecorator("scp_const", new ArgumentDecorator("fixed", new LiteralArgument("[...]"))))], new LinearTransition());
   if (consequent.length != 0) 
     consequent[consequent.length - 1].transition = new LinearTransition(empty);
   else
@@ -176,7 +171,7 @@ function parseIfStatement(condition) {
 function parseWhileStatement(loop) {
   var test = parseExpressionStatement(loop["test"])[0];
   var body = parseStatement(loop["body"]);
-  var empty = new Operator("print", [new ArgumentDecorator("1", new ArgumentDecorator("fixed", new LiteralArgument("[...]")))], new LinearTransition());
+  var empty = new Operator("print", [new ArgumentDecorator("1", new ArgumentDecorator("scp_const", new ArgumentDecorator("fixed", new LiteralArgument("[...]"))))], new LinearTransition());
   var nextOperator = body[0];
   var lastOperator = body[body.length - 1];
   if (!nextOperator) nextOperator = empty;
@@ -267,7 +262,7 @@ function processArgument(argument) {
     else if (isVariable(element)) 
       argumentObject = new VariableArgument(element);
     else 
-      argumentObject =new ConstantArgument(element);
+      argumentObject = new ConstantArgument(element);
   }
   return argumentObject;
 }
@@ -316,6 +311,5 @@ function isVariable(name) {
 }
 
 function isLiteral(name) {
-  //return (element.type == "Literal");
   return (name[0] == "[");
 }
