@@ -72,6 +72,7 @@ function parseFunction(syntax) {
   for(var i = 0; i < syntax.params.length; i++) { 
     parameters.push(parseInParameter(i + 1, syntax.params[i]));
   }
+  searchParameters(syntax.body.body, parameters);
   var operators = parseBlockStatement(syntax["body"]);
   var operator = new Operator("return", [], new LinearTransition());
   if (operators.length > 0) {
@@ -81,13 +82,21 @@ function parseFunction(syntax) {
   return new Program(parameters, operators);
 }
 
+function searchParameters(body, parameters) {
+  for(var i = 0; i < body.length; i++) {
+    if (body[i].type == "ReturnStatement")
+      parameters.push(parseOutParameter(parameters.length + 1, body[i].argument));
+    else break;
+  }
+}
+
 function parseInParameter(number, parameter) {
   return new ArgumentDecorator(number, new ArgumentDecorator("in", new SimpleArgument(parameter["name"])));
 }
 
-/*function parseOutParameter(number, parameter) {
-  return new ArgumentDecorator(number, new ArgumentDecorator("out", new ArgumentDecorator("assign", new VariableArgument(parameter["name"]))));
-}*/
+function parseOutParameter(number, parameter) {
+  return new ArgumentDecorator(number, new ArgumentDecorator("out", new SimpleArgument(parameter["name"])));
+}
 
 function parseStatement(statement) {
   switch(statement["type"]) {
@@ -101,10 +110,10 @@ function parseStatement(statement) {
       return parseForInStatement(statement);*/
     case "CallExpression":
       return parseCallExpression(statement);
-    case "EmptyStatement":
-      return [];
     case "WhileStatement":
       return parseWhileStatement(statement);
+    default:
+      return [];
   }
 }
 
