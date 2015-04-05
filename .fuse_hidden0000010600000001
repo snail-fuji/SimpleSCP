@@ -215,8 +215,11 @@ function parseSetLanguageOperator(languageOperator) {
 function parseUserFunction(expression) {
   var name = new ArgumentDecorator(1, processArgument(preprocessArgument([expression["callee"]["name"]])));
   var callArguments = new ArgumentDecorator(2, new ArgumentSet(parseArguments(expression["arguments"])));
+  //var process = new ArgumentDecorator("scp_var", new SimpleArgument("_process"));
   var process_assign = new ArgumentDecorator(3, processArgument(preprocessArgument(["assign", "_process"])));
   var process_fixed = new ArgumentDecorator(1, processArgument(preprocessArgument(["_process"])));
+  //var process_assign = new ArgumentDecorator(3, new ArgumentDecorator("assign", process));
+  //var process_fixed = new ArgumentDecorator(1, new ArgumentDecorator("fixed", process));
   var arguments = [name, callArguments, process_assign];
   var waiter = new Operator(waitReturn, [process_fixed], new LinearTransition());
   var caller = new Operator(call, arguments, new LinearTransition(waiter));
@@ -260,10 +263,11 @@ function convertArgument(argument) {
 }
 
 function processArgument(argument) {
-  if (argument.length == 0) return undefined;
   var argumentObject;
   for(var i = argument.length - 1; i >=  0; i--) {
     var element = argument[i]; 
+    //if (isLiteral(element))
+    //  argumentObject = new ArgumentDecorator("fixed", new LiteralArgument(element));
     if (isModifier(element)) 
       argumentObject = new ArgumentDecorator(element, argumentObject);
     else 
@@ -273,7 +277,6 @@ function processArgument(argument) {
 }
 
 function preprocessArgument(argument) {
-  if (argument.length == 0) return [];
   var preprocessedArgument = argument;
   argumentName = preprocessedArgument[preprocessedArgument.length - 1];
   if (preprocessedArgument.indexOf("scp_const") == -1 && preprocessedArgument.indexOf("scp_var") == -1) {

@@ -75,30 +75,6 @@ function ArgumentSet(arguments) {
   }
 }
 
-/*VariableArgument.prototype = Argument;
-function VariableArgument(name) {
-  this.identifier = name;
-  this.toString = function() {
-    return this.identifier;
-  }
-}
-
-LiteralArgument.prototype = Argument;
-function LiteralArgument(name) {
-  this.identifier = name;
-  this.toString = function() {
-    return this.identifier;
-  }
-}
-
-ConstantArgument.prototype = Argument;
-function ConstantArgument(name) {
-  this.identifier = name;
-  this.toString = function() {
-    return this.identifier;
-  }
-}*/
-
 SimpleArgument.prototype = Argument;
 function SimpleArgument(name) {
   this.identifier = name;

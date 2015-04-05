@@ -15,13 +15,15 @@ function startParser() {
       <tr>
         <td>
           <textarea id="source" rows = "30" cols="80" onkeydown="startParser()">
-function example(_set) {
-  while(searchElStr3([_set], [assign, _arc], [assign, _node])){
-    printEl([_node]);
-    proc_of_some_actions([_node]);
-    eraseEl([erase, _arc]);
-  }
+function example1() {
+  genSetStr3(
+    [_node1],
+    [assign, _arc],
+    [assign, _node2],
+    [], [], [_set]
+  );
 }
+          
           </textarea>
         </td>
         <td>
