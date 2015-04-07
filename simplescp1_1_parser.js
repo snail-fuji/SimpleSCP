@@ -39,6 +39,7 @@ const modifiers = [
   "erase",
   "scp_var",
   "scp_const",
+  "common",
 ]
 function parse(code) {
   syntax = esprima.parse(code);

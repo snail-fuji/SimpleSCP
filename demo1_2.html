@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <script src="simplescp1_2.js"></script>
+    <script src="simplescp1_2_modifiers.js"></script>
+    <script src="simplescp1_2_operators.js"></script>
+    <script>
+function test() {
+  var a = [new RandomArgument()];
+  var s = new SearchSetOperator(a);
+  s.setTransition(new LinearTransition(s));
+  var b = new BlockOperator([s]);
+  document.write(b);
+}
+test();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

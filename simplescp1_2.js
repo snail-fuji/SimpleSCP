@@ -1,4 +1,5 @@
-function Program(parameters, operators) {
+function Program(name, parameters, operators) {
+  this.name;
   this.parameters = parameters || [];
   this.operators = operators || [];
   for(var i = 0; i < this.operators.length; i++) 
@@ -7,7 +8,7 @@ function Program(parameters, operators) {
   	return "scp_program -> " + this.getName() + " (*<br>" + this.getParameters() + this.getOperators() + "*);;";
   }
   this.getName = function() {
-  	return "..program";
+  	return this.name;
   }
   this.getOperators = function() {
   	var operatorString = "-> rrel_operators: ... (*<br>";
@@ -66,7 +67,8 @@ function SimpleOperator(type, arguments) {
   this.setArguments = function(arguments) {
     this.arguments = [];
     for(var i = 0; i < arguments.length; i++) {
-      this.arguments.push(new NumberArgumentDecorator(i, arguments[i]));
+      if (!arguments[i]) break;
+      this.arguments.push(new NumberArgument((i + 1), arguments[i]));
     }
   }
   this.setArguments(arguments);
@@ -78,10 +80,12 @@ function SetOperator(type, arguments) {
     this.arguments = [];
     for(var i = 0; i < arguments.length; i++) {
       var argument = arguments[i];
+      if (!argument) break;
       if (i < arguments.length / 2)
-        this.arguments.push(new NumberArgumentDecorator((i + 1), arguments));
+        this.arguments.push(new NumberArgument((i + 1), arguments));
       else 
-        this.arguments.push(new NumberSetArgumentDecorator(i + 1 - argumentArray.length / 2, arguments));
+        this.arguments.push(new NumberSetArgument((i + 1 - arguments.length / 2), arguments));
+    }
   }
   this.setArguments(arguments); 
 }
@@ -93,33 +97,10 @@ function ComplicatedOperator(operators) {
     var body = "";
     for(var i = 0; i < this.operators.length; i++) {
       var operator = this.operators[i];
+      if (!operator) break;
       body += operator.toString() + "<br>";
     }
-  }
-}
-
-function BlockOperator(operators) {
-  ComplicatedOperator.call(this, operators);
-  this.setTransition = function(transition) {
-    this.operators[this.operators.length - 1].setTransition(transition);
-  }
-}
-
-function IfOperator(testOperator, thenOperator, elseOperator) {
-  ComplicatedOperator.call(this, [testOperator, thenOperator, elseOperator]);
-  //TODO add transition to test operator
-  this.operators[0].setTransition(new ConditionalTransition(thenOperator, elseOperator));
-  this.setTransition = function(transition) {
-    this.operators[1].setTransition(transition);
-    this.operators[2].setTransition(transition);
-  }
-}
-
-function WhileOperator(testOperator, loopOperator) {
-  ComplicatedOperator.call(this, [testOperator, loopOperator]);
-  this.operators[0].setTransition(new ConditionalTransition(loopOperator));
-  this.setTransition = function(transition) {
-    this.operators[1].setTransition(transition);
+    return body;
   }
 }
 
@@ -148,7 +129,7 @@ function SimpleArgument(name) {
 }
 
 function RandomArgument() {
-  SimpleArgument.call(this, "argument" + Math.floor(Math.random()*65536));
+  SimpleArgument.call(this, "_argument" + Math.floor(Math.random()*65536));
 }
 
 function ArgumentDecorator(name, argument) {

@@ -1,45 +1,35 @@
-//TODO Refactor this all - do it in objects
-const call = "call";
-const waitReturn = "waitReturn";
-const simpleLanguageOperators = [
-  "searchElStr3",
-  "searchEl",
-  "searchElStr5",
-  "genEl",
-  "genElStr3",
-  "genElStr5",
-  "eraseEl",
-  "eraseElStr3",
-  "eraseElStr5",
-  "sys_search",
-  "print",
-  "printNl",
-  "printEl",
-  "ifVarAssign",
-  "contDivInt",
-  "contDivIntRem",
-]
-const setLanguageOperators = [
-  "searchSetStr3",
-  "searchSet",
-  "searchSetStr5",
-  "genSet",
-  "genSetStr3",
-  "genSetStr5",
-  "eraseSet",
-  "eraseSetStr3",
-  "eraseSetStr5",
-]
-const modifiers = [
-  "fixed",
-  "assign",
-  "pos_const_perm",
-  "arc",
-  "node",
-  "erase",
-  "scp_var",
-  "scp_const",
-]
+const languageOperators = {
+  "search1":SearchElOperator;
+  "search3":SearchElStr3Operator;
+  "search5":SearchElStr5Operator;
+  "search2":SearchSetOperator;
+  "search6":SearchSetStr3Operator;
+  "search10":SearchSetStr5Operator;
+  "generate1":GenElOperator;
+  "generate3":GenElStr3Operator;
+  "generate5":GenElStr5Operator;
+  "generate2":GenSetOperator;
+  "generate6":GenSetStr3Operator;
+  "generate10":GenSetStr5Operator;
+  "erase1":EraseElOperator;
+  "erase3":EraseElStr3Operator;
+  "erase5":EraseElStr5Operator;
+  "erase2":EraseSetOperator;
+  "erase6":EraseSetStr3Operator;
+  "erase10":EraseSetStr5Operator;
+  "has_value1":IfVarAssignOperator;
+}
+const modifiers = {
+  "fixed":FixedArgument;
+  "assign":AssignArgument;
+  "pos_const_perm":PosConstPermArgument;
+  "arc":ArcArgument;
+  "node":NodeArgument;
+  "erase":EraseArgument;
+  "variable":ScpVarArgument;
+  "constant":ScpConstArgument;
+  "common":CommonArgument;
+}
 function parse(code) {
   syntax = esprima.parse(code);
   return format(design(parseFunction(syntax["body"][0]).toString()));
@@ -72,6 +62,7 @@ function parseFunction(syntax) {
   for(var i = 0; i < syntax.params.length; i++) { 
     parameters.push(parseInParameter(i + 1, syntax.params[i]));
   }
+  searchParameters(syntax.body.body, parameters);
   var operators = parseBlockStatement(syntax["body"]);
   var operator = new Operator("return", [], new LinearTransition());
   if (operators.length > 0) {
@@ -81,13 +72,21 @@ function parseFunction(syntax) {
   return new Program(parameters, operators);
 }
 
+function searchParameters(body, parameters) {
+  for(var i = 0; i < body.length; i++) {
+    if (body[i].type == "ReturnStatement")
+      parameters.push(parseOutParameter(parameters.length + 1, body[i].argument));
+    else break;
+  }
+}
+
 function parseInParameter(number, parameter) {
   return new ArgumentDecorator(number, new ArgumentDecorator("in", new SimpleArgument(parameter["name"])));
 }
 
-/*function parseOutParameter(number, parameter) {
-  return new ArgumentDecorator(number, new ArgumentDecorator("out", new ArgumentDecorator("assign", new VariableArgument(parameter["name"]))));
-}*/
+function parseOutParameter(number, parameter) {
+  return new ArgumentDecorator(number, new ArgumentDecorator("out", new SimpleArgument(parameter["name"])));
+}
 
 function parseStatement(statement) {
   switch(statement["type"]) {
@@ -101,10 +100,10 @@ function parseStatement(statement) {
       return parseForInStatement(statement);*/
     case "CallExpression":
       return parseCallExpression(statement);
-    case "EmptyStatement":
-      return [];
     case "WhileStatement":
       return parseWhileStatement(statement);
+    default:
+      return [];
   }
 }
 
@@ -195,6 +194,7 @@ function parseCallExpression(expression) {
     return parseUserFunction(expression);
   }
 }
+/*
 //TODO Do parsing more simply. Be DRY.
 function parseSimpleLanguageOperator(languageOperator) {
   //TODO Check linear transition
@@ -211,15 +211,19 @@ function parseSetLanguageOperator(languageOperator) {
   var transition = new LinearTransition();
   return [new Operator(name, arguments, transition)];
 }
+*/
+
+function parseSimpleLanguageOperator(languageOperator) {
+  var name = languageOperator["callee"]["name"] + languageOperator["arguments"].length;
+  var arguments = parseArguments(languageOperator["arguments"]);
+  return languageOperators[name](arguments);
+}
 
 function parseUserFunction(expression) {
   var name = new ArgumentDecorator(1, processArgument(preprocessArgument([expression["callee"]["name"]])));
   var callArguments = new ArgumentDecorator(2, new ArgumentSet(parseArguments(expression["arguments"])));
-  //var process = new ArgumentDecorator("scp_var", new SimpleArgument("_process"));
   var process_assign = new ArgumentDecorator(3, processArgument(preprocessArgument(["assign", "_process"])));
   var process_fixed = new ArgumentDecorator(1, processArgument(preprocessArgument(["_process"])));
-  //var process_assign = new ArgumentDecorator(3, new ArgumentDecorator("assign", process));
-  //var process_fixed = new ArgumentDecorator(1, new ArgumentDecorator("fixed", process));
   var arguments = [name, callArguments, process_assign];
   var waiter = new Operator(waitReturn, [process_fixed], new LinearTransition());
   var caller = new Operator(call, arguments, new LinearTransition(waiter));
@@ -263,11 +267,10 @@ function convertArgument(argument) {
 }
 
 function processArgument(argument) {
+  if (argument.length == 0) return undefined;
   var argumentObject;
   for(var i = argument.length - 1; i >=  0; i--) {
     var element = argument[i]; 
-    //if (isLiteral(element))
-    //  argumentObject = new ArgumentDecorator("fixed", new LiteralArgument(element));
     if (isModifier(element)) 
       argumentObject = new ArgumentDecorator(element, argumentObject);
     else 
@@ -277,6 +280,7 @@ function processArgument(argument) {
 }
 
 function preprocessArgument(argument) {
+  if (argument.length == 0) return [];
   var preprocessedArgument = argument;
   argumentName = preprocessedArgument[preprocessedArgument.length - 1];
   if (preprocessedArgument.indexOf("scp_const") == -1 && preprocessedArgument.indexOf("scp_var") == -1) {
