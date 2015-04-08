@@ -1,3 +1,6 @@
+function ReturnOperator() {
+  SimpleOperator.call(this, "return", []);
+}
 function CallOperator(arguments) {
   SimpleOperator.call(this, "call", arguments);
 }

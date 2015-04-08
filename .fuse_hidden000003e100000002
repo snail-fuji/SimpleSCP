@@ -103,9 +103,6 @@ function ComplicatedOperator(operators) {
     }
     return body;
   }
-  this.getName = function() {
-    return this.operators[0].getName();
-  }
 }
 
 function Argument(name) {

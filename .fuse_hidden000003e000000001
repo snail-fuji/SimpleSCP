@@ -18,9 +18,13 @@ function startParser() {
         <td>
           <textarea id="source" rows = "30" cols="80" onkeydown="startParser()">
 function example1() {
-  p1();
-  p2();
-}    
+  generate(
+    [_node1],
+    [assign, _arc],
+    [assign, _node2]
+  );
+}  
+          
           </textarea>
         </td>
         <td>

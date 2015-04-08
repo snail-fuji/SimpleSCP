@@ -1,34 +1,50 @@
+const languageOperatorsNames = [
+  "search",
+  "generate",
+  "erase",
+]
 const languageOperators = {
-  "search1":SearchElOperator;
-  "search3":SearchElStr3Operator;
-  "search5":SearchElStr5Operator;
-  "search2":SearchSetOperator;
-  "search6":SearchSetStr3Operator;
-  "search10":SearchSetStr5Operator;
-  "generate1":GenElOperator;
-  "generate3":GenElStr3Operator;
-  "generate5":GenElStr5Operator;
-  "generate2":GenSetOperator;
-  "generate6":GenSetStr3Operator;
-  "generate10":GenSetStr5Operator;
-  "erase1":EraseElOperator;
-  "erase3":EraseElStr3Operator;
-  "erase5":EraseElStr5Operator;
-  "erase2":EraseSetOperator;
-  "erase6":EraseSetStr3Operator;
-  "erase10":EraseSetStr5Operator;
-  "has_value1":IfVarAssignOperator;
+  "search1":SearchElOperator,
+  "search3":SearchElStr3Operator,
+  "search5":SearchElStr5Operator,
+  "search2":SearchSetOperator,
+  "search6":SearchSetStr3Operator,
+  "search10":SearchSetStr5Operator,
+  "generate1":GenElOperator,
+  "generate3":GenElStr3Operator,
+  "generate5":GenElStr5Operator,
+  "generate2":GenSetOperator,
+  "generate6":GenSetStr3Operator,
+  "generate10":GenSetStr5Operator,
+  "erase1":EraseElOperator,
+  "erase3":EraseElStr3Operator,
+  "erase5":EraseElStr5Operator,
+  "erase2":EraseSetOperator,
+  "erase6":EraseSetStr3Operator,
+  "erase10":EraseSetStr5Operator,
+  //"has_value1":IfVarAssignOperator,
 }
+const modifiersNames = [
+  "fixed",
+  "assign",
+  "pos_const_perm",
+  "arc",
+  "node",
+  "erase",
+  "variable",
+  "constant",
+  "common",
+]
 const modifiers = {
-  "fixed":FixedArgument;
-  "assign":AssignArgument;
-  "pos_const_perm":PosConstPermArgument;
-  "arc":ArcArgument;
-  "node":NodeArgument;
-  "erase":EraseArgument;
-  "variable":ScpVarArgument;
-  "constant":ScpConstArgument;
-  "common":CommonArgument;
+  "fixed":FixedArgument,
+  "assign":AssignArgument,
+  "pos_const_perm":PosConstPermArgument,
+  "arc":ArcArgument,
+  "node":NodeArgument,
+  "erase":EraseArgument,
+  "variable":ScpVarArgument,
+  "constant":ScpConstArgument,
+  "common":CommonArgument,
 }
 function parse(code) {
   syntax = esprima.parse(code);
@@ -59,17 +75,14 @@ function design(string) {
 
 function parseFunction(syntax) {
   var parameters = [];
-  for(var i = 0; i < syntax.params.length; i++) { 
+  /*for(var i = 0; i < syntax.params.length; i++) { 
     parameters.push(parseInParameter(i + 1, syntax.params[i]));
-  }
-  searchParameters(syntax.body.body, parameters);
+  }*/
+  //searchParameters(syntax.body.body, parameters);
   var operators = parseBlockStatement(syntax["body"]);
-  var operator = new Operator("return", [], new LinearTransition());
-  if (operators.length > 0) {
-    operators[operators.length - 1].transition = new LinearTransition(operator);
-    operators.push(operator);
-  }
-  return new Program(parameters, operators);
+  var returnOperator = new ReturnOperator();
+  operators.setTransition(new LinearTransition(returnOperator));
+  return new Program("lolkasa", parameters, [operators, returnOperator]);
 }
 
 function searchParameters(body, parameters) {
@@ -89,15 +102,13 @@ function parseOutParameter(number, parameter) {
 }
 
 function parseStatement(statement) {
-  switch(statement["type"]) {
+  switch(statement.type) {
     case "ExpressionStatement":
-      return parseExpressionStatement(statement["expression"]);
+      return parseExpressionStatement(statement.expression);
     case "BlockStatement":
       return parseBlockStatement(statement);
     case "CallExpression":
       return parseCallExpression(statement);
-    default:
-      return new EmptyStatement(?);
   }
 }
 
@@ -105,8 +116,6 @@ function parseExpressionStatement(expression) {
   switch(expression.type) {
     case "CallExpression":
       return parseCallExpression(expression);
-    case "ConditionalExpression":
-      return parseIfStatement(expression);
   }
 }
 
@@ -114,17 +123,16 @@ function parseBlockStatement(block) {
   var operators = [];
   var body = block["body"];
   for(var i = 0; i < body.length; i++) {
-    operators.push(parseStatement(body[i]));
+    var operator = parseStatement(body[i]);
+    if (operator && operators.length != 0) operators[operators.length - 1].setTransition(new LinearTransition(operator));
+    operators.push(operator);
   }
   return new BlockOperator(operators);
 }
 
 function parseCallExpression(expression) {
-  if (isSimpleLanguageOperator(expression["callee"]["name"])) {
-    return parseSimpleLanguageOperator(expression);
-  }
-  else if (isSetLanguageOperator(expression["callee"]["name"])) {
-    return parseSetLanguageOperator(expression);
+  if (isLanguageOperator(expression["callee"]["name"])) {
+    return parseLanguageOperator(expression);
   }
   else {
     return parseUserFunction(expression);
@@ -139,7 +147,7 @@ function parseLanguageOperator(languageOperator) {
 
 function parseUserFunction(expression) {
   var name = processArgument(preprocessArgument([expression["callee"]["name"]]));
-  var callArguments = new ArgumentSet(parseArguments(expression["arguments"]));
+  var callArguments = parseArguments(expression["arguments"]);
   return new CallUserFunctionOperator(name, callArguments);
 }
 
@@ -148,8 +156,7 @@ function parseArguments(argumentArray) {
   for(var i = 0; i < argumentArray.length; i++) {
     var argument = argumentArray[i]["elements"];
     var temporaryArgument = parseArgument(argument);
-    //TODO add this checking in Argument object
-    if (temporaryArgument) arguments.push(temporaryArgument);
+    arguments.push(temporaryArgument);
   }
   return arguments;
 }
@@ -161,6 +168,24 @@ function convertArgument(argument) {
       preprocessedArgument.push(argument[i]["name"]);
     else
       preprocessedArgument.push("[" + argument[i]["value"] + "]");
+  }
+  return preprocessedArgument;
+}
+
+function preprocessArgument(argument) {
+  if (argument.length == 0) return [];
+  var preprocessedArgument = argument;
+  argumentName = preprocessedArgument[preprocessedArgument.length - 1];
+  if (preprocessedArgument.indexOf("constant") == -1 && preprocessedArgument.indexOf("variable") == -1) {
+    if (isVariable(argumentName)) {
+      preprocessedArgument.unshift("variable");
+      if (preprocessedArgument.indexOf("fixed") == -1 && preprocessedArgument.indexOf("assign") == -1)
+        preprocessedArgument.unshift("fixed");
+    }
+    else {
+      preprocessedArgument.unshift("constant");
+      preprocessedArgument.unshift("fixed");
+    }
   }
   return preprocessedArgument;
 }
@@ -178,38 +203,16 @@ function processArgument(argument) {
   return argumentObject;
 }
 
-function preprocessArgument(argument) {
-  if (argument.length == 0) return [];
-  var preprocessedArgument = argument;
-  argumentName = preprocessedArgument[preprocessedArgument.length - 1];
-  if (preprocessedArgument.indexOf("scp_const") == -1 && preprocessedArgument.indexOf("scp_var") == -1) {
-    if (isVariable(argumentName)) {
-      preprocessedArgument.unshift("scp_var");
-      if (preprocessedArgument.indexOf("fixed") == -1 && preprocessedArgument.indexOf("assign") == -1)
-        preprocessedArgument.unshift("fixed");
-    }
-    else {
-      preprocessedArgument.unshift("scp_const");
-      preprocessedArgument.unshift("fixed");
-    }
-  }
-  return preprocessedArgument;
-}
-
 function parseArgument(argument) {
   return processArgument(preprocessArgument(convertArgument(argument)));
 }
 
-function isSimpleLanguageOperator(languageOperator) {
-  return (simpleLanguageOperators.indexOf(languageOperator) != -1)
-}
-
-function isSetLanguageOperator(languageOperator) {
-  return (setLanguageOperators.indexOf(languageOperator) != -1)
+function isLanguageOperator(languageOperator) {
+  return (languageOperatorsNames.indexOf(languageOperator) != -1)
 }
 
 function isModifier(modifier) {
-  return (modifiers.indexOf(modifier) != -1) 
+  return (modifiersNames.indexOf(modifier) != -1) 
 }
 
 function isVariable(name) {
