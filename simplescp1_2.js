@@ -113,7 +113,13 @@ function Argument(name) {
 }
 
 function ArgumentSet(arguments) {
-  this.arguments = arguments;
+  this.setArguments = function(arguments) {
+    preparedArguments = [];
+    for(var i = 0; i < arguments.length; i++) {
+      preparedArguments.push(new NumberArgument((i + 1), arguments[i]));
+    }
+    this.arguments = preparedArguments;
+  }
   this.toString = function() {
     var body = "... (*<br>";
     for(var i = 0; i < this.arguments.length; i++) {
@@ -123,6 +129,7 @@ function ArgumentSet(arguments) {
     body += "*)"
     return body;
   }
+  this.setArguments(arguments);
 }
 
 function SimpleArgument(name) {

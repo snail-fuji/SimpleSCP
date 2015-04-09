@@ -51,7 +51,7 @@ const modifiers = {
 }
 function parse(code) {
   syntax = esprima.parse(code);
-  return format(design(parseFunction(syntax["body"][0]).toString()));
+  return format(design(parseFunction(syntax.body[0]).toString()));
 }
 
 function format(string) {
@@ -82,10 +82,10 @@ function parseFunction(syntax) {
     parameters.push(parseInParameter(i + 1, syntax.params[i]));
   }*/
   //searchParameters(syntax.body.body, parameters);
-  var operators = parseBlockStatement(syntax["body"]);
+  var operators = parseBlockStatement(syntax.body);
   var returnOperator = new ReturnOperator();
   operators.setTransition(new LinearTransition(returnOperator));
-  return new Program("lolkasa", parameters, [operators, returnOperator]);
+  return new Program(syntax.name, parameters, [operators, returnOperator]);
 }
 
 function searchParameters(body, parameters) {
@@ -97,11 +97,11 @@ function searchParameters(body, parameters) {
 }
 
 function parseInParameter(number, parameter) {
-  return new ArgumentDecorator(number, new ArgumentDecorator("in", new SimpleArgument(parameter["name"])));
+  return new ArgumentDecorator(number, new ArgumentDecorator("in", new SimpleArgument(parameter.name)));
 }
 
 function parseOutParameter(number, parameter) {
-  return new ArgumentDecorator(number, new ArgumentDecorator("out", new SimpleArgument(parameter["name"])));
+  return new ArgumentDecorator(number, new ArgumentDecorator("out", new SimpleArgument(parameter.name)));
 }
 
 function parseStatement(statement) {
@@ -112,8 +112,8 @@ function parseStatement(statement) {
       return parseBlockStatement(statement);
     case "CallExpression":
       return parseCallExpression(statement);
-    case "Identifier":
-      return parseIfVarAssignExpression(statement);
+    default:
+      alert(statement.type);
   }
 }
 
@@ -121,15 +121,18 @@ function parseExpressionStatement(expression) {
   switch(expression.type) {
     case "CallExpression":
       return parseCallExpression(expression);
+    case "Identifier":
+      return parseIfVarAssignExpression(expression);
   }
 }
 
-function parseIfVarAssignExpression(statement) {
-  //return IfVarAssignOperator();
+function parseIfVarAssignExpression(expression) {
+  return new IfVarAssignOperator([processArgument(preprocessArgument([expression.name]))]);
 }
+
 function parseBlockStatement(block) {
   var operators = [];
-  var body = block["body"];
+  var body = block.body;
   for(var i = 0; i < body.length; i++) {
     var operator = parseStatement(body[i]);
     if (operator && operators.length != 0) operators[operators.length - 1].setTransition(new LinearTransition(operator));
@@ -139,7 +142,7 @@ function parseBlockStatement(block) {
 }
 
 function parseCallExpression(expression) {
-  if (isLanguageOperator(expression["callee"]["name"])) {
+  if (isLanguageOperator(expression.callee.name)) {
     return parseLanguageOperator(expression);
   }
   else {
@@ -148,14 +151,14 @@ function parseCallExpression(expression) {
 }
 
 function parseLanguageOperator(languageOperator) {
-  var name = languageOperator["callee"]["name"] + languageOperator["arguments"].length;
-  var arguments = parseArguments(languageOperator["arguments"]);
+  var name = languageOperator.callee.name + languageOperator.arguments.length;
+  var arguments = parseArguments(languageOperator.arguments);
   return new languageOperators[name](arguments);
 }
 
 function parseUserFunction(expression) {
-  var name = processArgument(preprocessArgument([expression["callee"]["name"]]));
-  var callArguments = parseArguments(expression["arguments"]);
+  var name = processArgument(preprocessArgument([expression.callee.name]));
+  var callArguments = parseArguments(expression.arguments);
   return new CallUserFunctionOperator(name, callArguments);
 }
 
