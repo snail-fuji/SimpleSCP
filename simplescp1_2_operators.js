@@ -92,11 +92,11 @@ function BlockOperator(operators) {
       this.operators[this.operators.length - 1].addTransition(transition);
   }
 }
-//TODO add fix when empty statement
+
 function IfOperator(testOperator, thenOperator, elseOperator) {
   ComplicatedOperator.call(this, [testOperator, thenOperator, elseOperator]);
+  //TODO do this method smaller
   this.addTransition = function(transition) {
-  	this.operators[0].clearTransitions();
     if (this.operators[1] && !this.operators[1].isEmpty()) {
       this.operators[0].addTransition(new ThenTransition(this.operators[1]));
       this.operators[1].addTransition(transition);
@@ -111,14 +111,19 @@ function IfOperator(testOperator, thenOperator, elseOperator) {
       this.operators[0].addTransition(new ElseTransition(transition.getOperator()));
   }
 }
-/*function WhileOperator(testOperator, loopOperator) {
+function WhileOperator(testOperator, loopOperator) {
   ComplicatedOperator.call(this, [testOperator, loopOperator]);
-  this.setTransition = function(transition) {
-    this.operators[1].setTransition(transition);
+  this.addTransition = function(transition) {
+    if (this.operators[1] && !this.operators[1].isEmpty()) {
+      this.operators[0].addTransition(new ThenTransition(this.operators[1]));
+      this.operators[0].addTransition(new ElseTransition(transition.getOperator()));
+      this.operators[1].addTransition(new GotoTransition(this.operators[0]));
+    }
+    else
+      this.operators[0].addTransition(new ThenTransition(transition.getOperator()));
   }
-  testOperator.setTransition(new ConditionalTransition(loopOperator));
-  loopOperator
-}*/
+
+}
 function CallUserFunctionOperator(calleeArgument, arguments) {
   var process = new RandomArgument();
   var callOperator = new CallOperator([calleeArgument, new ArgumentSet(arguments), new AssignArgument(process)]);

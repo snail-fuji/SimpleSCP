@@ -44,9 +44,6 @@ function BasicOperator(type) {
   this.addTransition = function(transition) {
     this.transitions.push(transition);
   }
-  this.clearTransitions = function() {
-    this.transitions = [];
-  }
   this.toString = function() {
     return "->" + this.getName() + " (*<br>" + this.getType() + this.getArguments() + this.getTransitions() + "*);;<br>";
   }
@@ -72,7 +69,6 @@ function BasicOperator(type) {
   this.getName = function() {
     return "..operator" + this.id;
   }
-  //this.setTransition(new LinearTransition(undefined));
 }
 
 function SimpleOperator(type, arguments) {
@@ -107,15 +103,6 @@ function SetOperator(type, arguments) {
 function ComplicatedOperator(operators) {
   Operator.call(this);
   this.operators = operators;
-  /*this.setOperators = function(operators) {
-    this.operators = [];
-    for(var i = 0; i < operators.length; i++) {
-      var operator = operators[i];
-      if (!operator.isEmpty()) {
-        this.operators.push(operator);
-      }
-    }
-  }*/
   this.isEmpty = function() {
     return this.operators.length == 0;
   }
@@ -131,7 +118,6 @@ function ComplicatedOperator(operators) {
   this.getName = function() {
     return this.operators[0].getName();
   }
-  //this.setOperators(operators);
 }
 
 function Argument(name) {

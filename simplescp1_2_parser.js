@@ -119,6 +119,8 @@ function parseStatement(statement) {
       return parseIfStatement(statement);
     case "Identifier":
       return parseIfVarAssignExpression(statement);
+    case "WhileStatement":
+      return parseWhileStatement(statement);
     default:
       alert(statement.type);
   }
@@ -129,6 +131,12 @@ function parseIfStatement(statement) {
   var consequent = parseStatement(statement.consequent);
   var alternate = parseStatement(statement.alternate);
   return new IfOperator(test, consequent, alternate);
+}
+
+function parseWhileStatement(statement) {
+  var test = parseStatement(statement.test);
+  var body = parseStatement(statement.body);
+  return new WhileOperator(test, body);
 }
 
 function parseExpressionStatement(expression) {
