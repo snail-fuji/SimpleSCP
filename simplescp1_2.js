@@ -99,7 +99,7 @@ function ComplicatedOperator(operators) {
     for(var i = 0; i < this.operators.length; i++) {
       var operator = this.operators[i];
       if (!operator) break;
-      body += operator.toString() + "<br>";
+      body += operator.toString();
     }
     return body;
   }

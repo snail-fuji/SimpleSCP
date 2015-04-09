@@ -2,6 +2,7 @@ const languageOperatorsNames = [
   "search",
   "generate",
   "erase",
+  "print",
 ]
 const languageOperators = {
   "search1":SearchElOperator,
@@ -22,7 +23,9 @@ const languageOperators = {
   "erase2":EraseSetOperator,
   "erase6":EraseSetStr3Operator,
   "erase10":EraseSetStr5Operator,
-  //"has_value1":IfVarAssignOperator,
+  "print1":PrintOperator,
+  "var_assign1":VarAssignOperator,
+  "cont_assign1":ContAssignOperator,
 }
 const modifiersNames = [
   "fixed",
@@ -109,6 +112,8 @@ function parseStatement(statement) {
       return parseBlockStatement(statement);
     case "CallExpression":
       return parseCallExpression(statement);
+    case "Identifier":
+      return parseIfVarAssignExpression(statement);
   }
 }
 
@@ -119,6 +124,9 @@ function parseExpressionStatement(expression) {
   }
 }
 
+function parseIfVarAssignExpression(statement) {
+  //return IfVarAssignOperator();
+}
 function parseBlockStatement(block) {
   var operators = [];
   var body = block["body"];
@@ -154,22 +162,32 @@ function parseUserFunction(expression) {
 function parseArguments(argumentArray) {
   var arguments = [];
   for(var i = 0; i < argumentArray.length; i++) {
-    var argument = argumentArray[i]["elements"];
+    var argument = argumentArray[i];
     var temporaryArgument = parseArgument(argument);
     arguments.push(temporaryArgument);
   }
   return arguments;
 }
 
+//TODO split this on two functions
 function convertArgument(argument) {
   var preprocessedArgument = [];
-  for(var i = 0; i < argument.length; i++) {
-    if(argument[i].type == "Identifier")
-      preprocessedArgument.push(argument[i]["name"]);
-    else
-      preprocessedArgument.push("[" + argument[i]["value"] + "]");
+  if (argument.elements) {
+    argument = argument.elements;
+    for(var i = 0; i < argument.length; i++) {
+      pushPartOfArgument(argument[i], preprocessedArgument);
+    }
   }
+  else 
+    pushPartOfArgument(argument, preprocessedArgument);
   return preprocessedArgument;
+}
+
+function pushPartOfArgument(part, argument) {
+  if(part.type == "Identifier")
+    argument.push(part.name);
+  else
+    argument.push("[" + part.value + "]");
 }
 
 function preprocessArgument(argument) {

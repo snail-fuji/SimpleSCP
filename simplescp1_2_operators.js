@@ -1,3 +1,6 @@
+function PrintOperator(arguments) {
+  SimpleOperator.call(this, "print", arguments);
+}
 function ReturnOperator() {
   SimpleOperator.call(this, "return", []);
 }
@@ -36,6 +39,15 @@ function EraseElStr5Operator(arguments) {
 }
 function IfVarAssignOperator(arguments) {
   SimpleOperator.call(this, "ifVarAssign", arguments);
+}
+function VarAssignOperator(arguments) {
+  SimpleOperator.call(this, "varAssign", arguments);
+}
+function ContAssignOperator(arguments) {
+  SimpleOperator.call(this, "contAssign", arguments);
+}
+function ContAddOperator(arguments) {
+  SimpleOperator.call(this, "contAdd", arguments);  
 }
 function GenSetOperator(arguments) {
   SetOperator.call(this, "genSet", arguments);
