@@ -3,6 +3,8 @@ const languageOperatorsNames = [
   "generate",
   "erase",
   "print",
+  "var_assign",
+  "cont_assign",
 ]
 const languageOperators = {
   "search1":SearchElOperator,
@@ -78,14 +80,14 @@ function design(string) {
 
 function parseFunction(syntax) {
   var parameters = [];
-  /*for(var i = 0; i < syntax.params.length; i++) { 
-    parameters.push(parseInParameter(i + 1, syntax.params[i]));
-  }*/
+  //for(var i = 0; i < syntax.params.length; i++) { 
+  //  parameters.push(parseInParameter(i + 1, syntax.params[i]));
+  //}
   //searchParameters(syntax.body.body, parameters);
   var operators = parseBlockStatement(syntax.body);
   var returnOperator = new ReturnOperator();
-  operators.setTransition(new LinearTransition(returnOperator));
-  return new Program(syntax.name, parameters, [operators, returnOperator]);
+  operators.addTransition(new GotoTransition(returnOperator));
+  return new Program(syntax.id.name, parameters, [operators, returnOperator]);
 }
 
 function searchParameters(body, parameters) {
@@ -105,6 +107,7 @@ function parseOutParameter(number, parameter) {
 }
 
 function parseStatement(statement) {
+  if (statement == null) return undefined;
   switch(statement.type) {
     case "ExpressionStatement":
       return parseExpressionStatement(statement.expression);
@@ -112,9 +115,20 @@ function parseStatement(statement) {
       return parseBlockStatement(statement);
     case "CallExpression":
       return parseCallExpression(statement);
+    case "IfStatement":
+      return parseIfStatement(statement);
+    case "Identifier":
+      return parseIfVarAssignExpression(statement);
     default:
       alert(statement.type);
   }
+}
+
+function parseIfStatement(statement) {
+  var test = parseStatement(statement.test);
+  var consequent = parseStatement(statement.consequent);
+  var alternate = parseStatement(statement.alternate);
+  return new IfOperator(test, consequent, alternate);
 }
 
 function parseExpressionStatement(expression) {
@@ -135,7 +149,8 @@ function parseBlockStatement(block) {
   var body = block.body;
   for(var i = 0; i < body.length; i++) {
     var operator = parseStatement(body[i]);
-    if (operator && operators.length != 0) operators[operators.length - 1].setTransition(new LinearTransition(operator));
+    //TODO add this block to blockoperator
+    if (operator && operators.length != 0) operators[operators.length - 1].addTransition(new GotoTransition(operator));
     operators.push(operator);
   }
   return new BlockOperator(operators);

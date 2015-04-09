@@ -96,20 +96,17 @@ function BlockOperator(operators) {
 function IfOperator(testOperator, thenOperator, elseOperator) {
   ComplicatedOperator.call(this, [testOperator, thenOperator, elseOperator]);
   this.addTransition = function(transition) {
-  	this.operators[0].clearTransitions();
-    if (this.operators[1] && !this.operators[1].isEmpty()) {
-      this.operators[0].addTransition(new ThenTransition(this.operators[1]));
+    if (this.operators[1] && !this.operators[1].isEmpty())
       this.operators[1].addTransition(transition);
-    }
     else
       this.operators[0].addTransition(new ThenTransition(transition.getOperator()));
-    if (this.operators[2] && !this.operators[2].isEmpty()) {
-      this.operators[0].addTransition(new ElseTransition(this.operators[2]));
+    if (this.operators[2] && !this.operators[2].isEmpty())
       this.operators[2].addTransition(transition);
-    }
     else
       this.operators[0].addTransition(new ElseTransition(transition.getOperator()));
   }
+  testOperator.addTransition(new ThenTransition(thenOperator));
+  testOperator.addTransition(new ElseTransition(elseOperator));
 }
 /*function WhileOperator(testOperator, loopOperator) {
   ComplicatedOperator.call(this, [testOperator, loopOperator]);
