@@ -9,6 +9,7 @@ const languageOperatorsNames = [
 const languageOperators = {
   "search1":SearchElOperator,
   "search3":SearchElStr3Operator,
+  "sys_search4":SysSearchOperator,
   "search5":SearchElStr5Operator,
   "search2":SearchSetOperator,
   "search6":SearchSetStr3Operator,
@@ -80,10 +81,10 @@ function design(string) {
 
 function parseFunction(syntax) {
   var parameters = [];
-  //for(var i = 0; i < syntax.params.length; i++) { 
-  //  parameters.push(parseInParameter(i + 1, syntax.params[i]));
-  //}
-  //searchParameters(syntax.body.body, parameters);
+  for(var i = 0; i < syntax.params.length; i++) { 
+    parameters.push(parseInParameter(i + 1, syntax.params[i]));
+  }
+  searchParameters(syntax.body.body, parameters);
   var operators = parseBlockStatement(syntax.body);
   var returnOperator = new ReturnOperator();
   operators.addTransition(new GotoTransition(returnOperator));
@@ -99,15 +100,15 @@ function searchParameters(body, parameters) {
 }
 
 function parseInParameter(number, parameter) {
-  return new ArgumentDecorator(number, new ArgumentDecorator("in", new SimpleArgument(parameter.name)));
+  return new NumberArgument(number, new InArgument(new SimpleArgument(parameter.name)));
 }
 
 function parseOutParameter(number, parameter) {
-  return new ArgumentDecorator(number, new ArgumentDecorator("out", new SimpleArgument(parameter.name)));
+  return new NumberArgument(number, new OutArgument(new SimpleArgument(parameter.name)));
 }
 
 function parseStatement(statement) {
-  if (statement == null) return undefined;
+  if (statement == null) return new EmptyOperator();
   switch(statement.type) {
     case "ExpressionStatement":
       return parseExpressionStatement(statement.expression);
@@ -122,7 +123,7 @@ function parseStatement(statement) {
     case "WhileStatement":
       return parseWhileStatement(statement);
     default:
-      alert(statement.type);
+      return new EmptyOperator();
   }
 }
 
@@ -221,16 +222,11 @@ function preprocessArgument(argument) {
   var preprocessedArgument = argument;
   argumentName = preprocessedArgument[preprocessedArgument.length - 1];
   if (preprocessedArgument.indexOf("constant") == -1 && preprocessedArgument.indexOf("variable") == -1) {
-    if (isVariable(argumentName)) {
-      preprocessedArgument.unshift("variable");
-      if (preprocessedArgument.indexOf("fixed") == -1 && preprocessedArgument.indexOf("assign") == -1)
-        preprocessedArgument.unshift("fixed");
-    }
-    else {
-      preprocessedArgument.unshift("constant");
-      preprocessedArgument.unshift("fixed");
-    }
+    if (isVariable(argumentName)) preprocessedArgument.unshift("variable");
+    else preprocessedArgument.unshift("constant");
   }
+  if (preprocessedArgument.indexOf("fixed") == -1 && preprocessedArgument.indexOf("assign") == -1)
+        preprocessedArgument.unshift("fixed");
   return preprocessedArgument;
 }
 

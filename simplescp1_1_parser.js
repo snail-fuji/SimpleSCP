@@ -18,6 +18,7 @@ const simpleLanguageOperators = [
   "ifVarAssign",
   "contDivInt",
   "contDivIntRem",
+  "sys_gen",
 ]
 const setLanguageOperators = [
   "searchSetStr3",

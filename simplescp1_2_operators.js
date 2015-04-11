@@ -49,6 +49,9 @@ function ContAssignOperator(arguments) {
 function ContAddOperator(arguments) {
   SimpleOperator.call(this, "contAdd", arguments);  
 }
+function SysSearchOperator(arguments) {
+  SimpleOperator.call(this, "sys_search", arguments);
+}
 function GenSetOperator(arguments) {
   SetOperator.call(this, "genSet", arguments);
 }
@@ -76,54 +79,76 @@ function EraseSetStr3Operator(arguments) {
 function EraseSetStr5Operator(arguments) {
   SetOperator.call(this, "searchSetStr5", arguments);
 }
-/*function EmptyOperator() {
+function EmptyOperator() {
   ComplicatedOperator.call(this, []);
-  this.setPreviousOperator = function(previousOperator) {
-    this.operators = [previousOperator];
+  this.addTransition = function(transition) {
   }
-  this.setTransition = function(transition) {
-  	this.operators[0].setTransition(transition);
-  }
-}*/
+}
 function BlockOperator(operators) {
   ComplicatedOperator.call(this, operators);
   this.addTransition = function(transition) {
-    if (this.operators.length != 0) 
+    //TODO There is an error!!!!!
+    if (!this.isEmpty()) 
       this.operators[this.operators.length - 1].addTransition(transition);
   }
 }
 
 function IfOperator(testOperator, thenOperator, elseOperator) {
   ComplicatedOperator.call(this, [testOperator, thenOperator, elseOperator]);
-  //TODO do this method smaller
+  //TODO Split this method
   this.addTransition = function(transition) {
-    if (this.operators[1] && !this.operators[1].isEmpty()) {
-      this.operators[0].addTransition(new ThenTransition(this.operators[1]));
+    if (!this.operators[1].isEmpty() && !this.operators[2].isEmpty()) {
       this.operators[1].addTransition(transition);
-    }
-    else
-      this.operators[0].addTransition(new ThenTransition(transition.getOperator()));
-    if (this.operators[2] && !this.operators[2].isEmpty()) {
-      this.operators[0].addTransition(new ElseTransition(this.operators[2]));
       this.operators[2].addTransition(transition);
     }
-    else
+    else if (!this.operators[1].isEmpty()) {
+      this.operators[1].addTransition(transition);
       this.operators[0].addTransition(new ElseTransition(transition.getOperator()));
+    }
+    else if (!this.operators[2].isEmpty()) {
+      this.operators[2].addTransition(transition);
+      this.operators[0].addTransition(new ThenTransition(transition.getOperator()));
+    }
+    else 
+      this.operators[0].addTransition(transition);
   }
+  this.initTransitions = function() {
+    if (!this.operators[1].isEmpty())
+      this.operators[0].addTransition(new ThenTransition(this.operators[1]));
+    if (!this.operators[2].isEmpty())
+      this.operators[0].addTransition(new ElseTransition(this.operators[2]));
+  }
+  this.initTransitions();
 }
+
 function WhileOperator(testOperator, loopOperator) {
   ComplicatedOperator.call(this, [testOperator, loopOperator]);
   this.addTransition = function(transition) {
-    if (this.operators[1] && !this.operators[1].isEmpty()) {
-      this.operators[0].addTransition(new ThenTransition(this.operators[1]));
       this.operators[0].addTransition(new ElseTransition(transition.getOperator()));
+  }
+  this.initTransitions = function() {
+    if (!this.operators[1].isEmpty()) {
+      this.operators[0].addTransition(new ThenTransition(this.operators[1]));
       this.operators[1].addTransition(new GotoTransition(this.operators[0]));
     }
-    else
-      this.operators[0].addTransition(new ThenTransition(transition.getOperator()));
+    else {
+      this.operators[0].addTransition(new ThenTransition(this.operators[0]));
+    }
   }
-
+  this.initTransitions();
 }
+/*function DoWhileOperator(testOperator, loopOperator) {
+  ComplicatedOperator.call(this, [loopOperator, testOperator]);
+  this.addTransition = function(transition) {
+    if (this.operators[0] && !this.operators[0].isEmpty()) {
+      this.operators[1].addTransition(new ThenTransition(this.operators[0]));
+      this.operators[1].addTransition(new ElseTransition(transition.getOperator()));
+      this.operators[0].addTransition(new GotoTransition(this.operators[0]));
+    }
+    else
+      this.operators[1].addTransition(transition);
+  }
+}*/
 function CallUserFunctionOperator(calleeArgument, arguments) {
   var process = new RandomArgument();
   var callOperator = new CallOperator([calleeArgument, new ArgumentSet(arguments), new AssignArgument(process)]);

@@ -34,3 +34,9 @@ function NumberArgument(number, argument) {
 function NumberSetArgument(number, argument) {
   ArgumentDecorator.call(this, "set_" + number, argument);
 }
+function InArgument(argument) {
+  ArgumentDecorator.call(this, "in", argument);
+}
+function OutArgument(argument) {
+  ArgumentDecorator.call(this, "out", argument);
+}

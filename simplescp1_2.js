@@ -2,8 +2,8 @@ function Program(name, parameters, operators) {
   this.name = name;
   this.parameters = parameters || [];
   this.operators = operators || [];
-  for(var i = 0; i < this.operators.length; i++) 
-    this.operators[i].id = i + 1;
+  //for(var i = 0; i < this.operators.length; i++) 
+  //  this.operators[i].id = i + 1;
   this.toString = function() {
   	return "scp_program -> " + this.getName() + " (*<br>" + this.getParameters() + this.getOperators() + "*);;";
   }
@@ -54,7 +54,7 @@ function BasicOperator(type) {
     var argumentString = "";
     for(var i = 0; i < this.arguments.length; i++) {
       var argument = this.arguments[i];
-      argumentString += "-> " + argument.toString() + ";;<br>";
+      if (argument) argumentString += "-> " + argument.toString() + ";;<br>";
     }
     return argumentString;
   }
@@ -77,7 +77,7 @@ function SimpleOperator(type, arguments) {
     this.arguments = [];
     for(var i = 0; i < arguments.length; i++) {
       //TODO WTF? Check this. Continue or break???
-      if (!arguments[i]) continue;
+      if (!arguments[i]) break;
       this.arguments.push(new NumberArgument((i + 1), arguments[i]));
     }
   }
@@ -92,9 +92,9 @@ function SetOperator(type, arguments) {
       var argument = arguments[i];
       if (!argument) continue;
       if (i < arguments.length / 2)
-        this.arguments.push(new NumberArgument((i + 1), arguments));
+        this.arguments.push(new NumberArgument((i + 1), argument));
       else 
-        this.arguments.push(new NumberSetArgument((i + 1 - arguments.length / 2), arguments));
+        this.arguments.push(new NumberSetArgument((i + 1 - arguments.length / 2), argument));
     }
   }
   this.setArguments(arguments); 
@@ -110,7 +110,7 @@ function ComplicatedOperator(operators) {
     var body = "";
     for(var i = 0; i < this.operators.length; i++) {
       var operator = this.operators[i];
-      if (!operator || operator.isEmpty()) continue;
+      if (!operator) continue;
       body += operator.toString();
     }
     return body;
@@ -128,7 +128,7 @@ function ArgumentSet(arguments) {
   this.setArguments = function(arguments) {
     preparedArguments = [];
     for(var i = 0; i < arguments.length; i++) {
-      preparedArguments.push(new NumberArgument((i + 1), arguments[i]));
+      if (arguments[i]) preparedArguments.push(new NumberArgument((i + 1), arguments[i]));
     }
     this.arguments = preparedArguments;
   }
