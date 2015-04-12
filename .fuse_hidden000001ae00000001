@@ -129,7 +129,6 @@ function ComplicatedOperator(operators) {
   this.setAdditionalInfo = function(additionalInfo) {
     if (!this.isEmpty()) this.operators[0].setAdditionalInfo(additionalInfo);
   }
-  while(!this.isEmpty() && this.operators[0].isEmpty()) this.operators.shift();
 }
 
 function Argument(name) {

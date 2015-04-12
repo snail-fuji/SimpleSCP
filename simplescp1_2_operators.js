@@ -49,6 +49,33 @@ function ContAssignOperator(arguments) {
 function ContAddOperator(arguments) {
   SimpleOperator.call(this, "contAdd", arguments);  
 }
+function ContSubtractOperator(arguments) {
+  SimpleOperator.call(this, "contSub", arguments);
+}
+function ContMultipleOperator(arguments) {
+  SimpleOperator.call(this, "contMult", arguments);
+}
+function ContDivideOperator(arguments) {
+  SimpleOperator.call(this, "contDiv", arguments);
+}
+function ContCosOperator(arguments) {
+  SimpleOperator.call(this, "contCos", arguments);
+}
+function ContSinOperator(arguments) {
+  SimpleOperator.call(this, "contSin", arguments);
+}
+function ContArccosOperator(arguments) {
+  SimpleOperator.call(this, "contACos", arguments);
+}
+function ContArcsinOperator(arguments) {
+  SimpleOperator.call(this, "contASin", arguments);
+}
+function IfGreaterOperator(arguments) {
+  SimpleOperator.call(this, "ifGr", arguments);
+}
+function SysGenerateOperator(arguments) {
+  SimpleOperator.call(this, "sys_gen", arguments);
+}
 function SysSearchOperator(arguments) {
   SimpleOperator.call(this, "sys_search", arguments);
 }
@@ -137,6 +164,24 @@ function WhileOperator(testOperator, loopOperator) {
   }
   this.initTransitions();
 }
+
+function ForInOperator(iterator, iterable) {
+  ComplicatedOperator.call(this, [testOperator, loopOperator]);
+  this.addTransition = function(transition) {
+      this.operators[0].addTransition(new ElseTransition(transition.getOperator()));
+  }
+  this.initTransitions = function() {
+    if (!this.operators[1].isEmpty()) {
+      this.operators[0].addTransition(new ThenTransition(this.operators[1]));
+      this.operators[1].addTransition(new GotoTransition(this.operators[0]));
+    }
+    else {
+      this.operators[0].addTransition(new ThenTransition(this.operators[0]));
+    }
+  }
+  this.initTransitions();
+}
+
 /*function DoWhileOperator(testOperator, loopOperator) {
   ComplicatedOperator.call(this, [loopOperator, testOperator]);
   this.addTransition = function(transition) {

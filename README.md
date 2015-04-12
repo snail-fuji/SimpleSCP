@@ -1,18 +1,29 @@
 # SimpleSCP
 SimpleSCP to SCP translator based on Esprima parser.
 
-My attemp to do SCP programs more readable. Just look at SCP operator:
+My attemp to do SCP programs more readable. Just look at SCP program:
 ```
-... (*
-  <- searchElStr3;;
-  -> rrel_1: rrel_scp_var: rrel_fixed: a;
-  -> rrel_2: rrel_scp_var: rrel_assign: b;
-  -> rrel_3: rrel_scp_var: rrel_fixed: c;
+scp_program -> example(*
+  -> rrel_params: ... (*
+  *);;
+  -> rrel_operators: ... (*
+    -> rrel_init: ..operator1 (*
+      <- print;;
+      -> rrel_1: rrel_fixed: rrel_scp_const: [Hello world!];;
+      => nrel_goto: ..operator2;;
+    *);;
+    -> ..operator2 (*
+      <- return;;
+    *);;
+  *);;
 *);;
+
 ```
 
 The same code in SimpleSCP:
 ```
-searchElStr3([fixed, a], [assign, b], [fixed, c]);
+function example() {
+  print("Hello world!");
+}
 ```
 
