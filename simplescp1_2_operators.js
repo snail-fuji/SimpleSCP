@@ -29,13 +29,13 @@ function SearchElStr5Operator(arguments) {
   SimpleOperator.call(this, "searchElStr5", arguments);
 }
 function EraseElOperator(arguments) {
-  SimpleOperator.call(this, "searchEl", arguments);
+  SimpleOperator.call(this, "eraseEl", arguments);
 }
 function EraseElStr3Operator(arguments) {
-  SimpleOperator.call(this, "searchElStr3", arguments);
+  SimpleOperator.call(this, "eraseElStr3", arguments);
 }
 function EraseElStr5Operator(arguments) {
-  SimpleOperator.call(this, "searchElStr5", arguments);
+  SimpleOperator.call(this, "eraseElStr5", arguments);
 }
 function IfVarAssignOperator(arguments) {
   SimpleOperator.call(this, "ifVarAssign", arguments);
@@ -98,13 +98,13 @@ function SearchSetStr5Operator(arguments) {
   SetOperator.call(this, "searchSetStr5", arguments);
 }
 function EraseSetOperator(arguments) {
-  SetOperator.call(this, "searchSet", arguments);
+  SetOperator.call(this, "eraseSet", arguments);
 }
 function EraseSetStr3Operator(arguments) {
-  SetOperator.call(this, "searchSetStr3", arguments);
+  SetOperator.call(this, "eraseSetStr3", arguments);
 }
 function EraseSetStr5Operator(arguments) {
-  SetOperator.call(this, "searchSetStr5", arguments);
+  SetOperator.call(this, "eraseSetStr5", arguments);
 }
 function EmptyOperator() {
   ComplicatedOperator.call(this, []);
