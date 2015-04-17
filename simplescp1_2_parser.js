@@ -25,7 +25,7 @@ const languageOperators = {
   "search2":SearchSetOperator,
   "search6":SearchSetStr3Operator,
   "search10":SearchSetStr5Operator,
-  "generate1":GenElOperator,
+  //"generate1":GenElOperator,
   "generate3":GenElStr3Operator,
   "sys_generate4":SysGenerateOperator,
   "generate5":GenElStr5Operator,
@@ -78,8 +78,17 @@ function parse(code) {
   return format(design(parseFunction(syntax.body[0]).toString()));
 }
 
+function consoleParse(code) {
+  syntax = esprima.parse(code);
+  return formatConsole(design(parseFunction(syntax.body[0]).toString()));
+}
+
 function format(string) {
   return string.split(' ').join('&nbsp;');
+}
+
+function formatConsole(string) {
+  return string.split('<br>').join('\n');
 }
 
 function design(string) {
@@ -89,11 +98,11 @@ function design(string) {
   while(index != -1) {
     line = string.substr(0, index + 4);
     string = string.substr(index + 4);
-    if (line.search("\\*\\)") != -1) spaces -= 2;
+    if (line.search("\\*\\)") != -1) spaces -= 4;
     for(i = 0; i < spaces; i++)
       designedString += " ";
     designedString += line;
-    if (line.search("\\(\\*") != -1) spaces += 2;
+    if (line.search("\\(\\*") != -1) spaces += 4;
     index = string.search("<br>");
   }
   designedString += string;

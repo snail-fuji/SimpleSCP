@@ -22,13 +22,16 @@ function Program(name, parameters, operators) {
 	  return operatorString;
   }
   this.getParameters = function() {
-    var parameterString = "-> rrel_params: ... (*<br>";
-    for(var i = 0; i < this.parameters.length; i++) {
-      var parameter = this.parameters[i];
-      parameterString += "-> " + parameter.toString() + ";;<br>";
+    if (parameters.length != 0) {
+      var parameterString = "-> rrel_params: ... (*<br>";
+      for(var i = 0; i < this.parameters.length; i++) {
+        var parameter = this.parameters[i];
+        parameterString += "-> " + parameter.toString() + ";;<br>";
+      }
+      parameterString += "*);;<br>";
+      return parameterString;  
     }
-    parameterString += "*);;<br>";
-    return parameterString;  
+    else return "";
   }
 }
 

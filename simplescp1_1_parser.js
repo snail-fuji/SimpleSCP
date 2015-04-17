@@ -59,8 +59,7 @@ function design(string) {
     line = string.substr(0, index + 4);
     string = string.substr(index + 4);
     if (line.search("\\*\\)") != -1) spaces -= 2;
-    for(i = 0; i < spaces; i++)
-      designedString += " ";
+    for(i = 0; i < spaces; i++) designedString += " ";
     designedString += line;
     if (line.search("\\(\\*") != -1) spaces += 2;
     index = string.search("<br>");

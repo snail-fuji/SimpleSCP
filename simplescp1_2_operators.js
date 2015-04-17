@@ -195,7 +195,7 @@ function ForInOperator(iterator, iterable) {
   }
 }*/
 function CallUserFunctionOperator(calleeArgument, arguments) {
-  var process = new RandomArgument();
+  var process = new ScpVarArgument(new RandomArgument());
   var callOperator = new CallOperator([calleeArgument, new ArgumentSet(arguments), new AssignArgument(process)]);
   var waitReturnOperator = new WaitReturnOperator([new FixedArgument(process)]);
   ComplicatedOperator.call(this, [callOperator, waitReturnOperator]);
