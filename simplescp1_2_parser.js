@@ -86,7 +86,7 @@ function consoleParse(code) {
 }
 
 function getSCSCode(code) {
-  allSCS = code.match(/\/\*scs[^\*]*\*\//g);
+  allSCS = code.match(/\/\*scs[^\*]*\*\//g) || [];
   SCSCode = "";
   for(var i = 0; i < allSCS.length; i++) {
     var SCSLine = allSCS[i].substr(5);
