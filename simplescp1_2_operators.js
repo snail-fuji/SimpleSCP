@@ -79,6 +79,9 @@ function SysGenerateOperator(arguments) {
 function SysSearchOperator(arguments) {
   SimpleOperator.call(this, "sys_search", arguments);
 }
+function PrintElOperator(arguments) {
+  SimpleOperator.call(this, "printEl", arguments);
+}
 function GenSetOperator(arguments) {
   SetOperator.call(this, "genSet", arguments);
 }

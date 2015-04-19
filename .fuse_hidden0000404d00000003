@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="esprima.js"></script>
+    <script src="simplescp1_2.js"></script>
+    <script src="simplescp1_2_modifiers.js"></script>
+    <script src="simplescp1_2_operators.js"></script>
+    <script src="simplescp1_2_parser.js"></script>
+    <script>
+function startParser() {
+  document.getElementById("program").innerHTML = parse(document.getElementById("source").value);
+}
+    </script>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td>
+          <textarea id="source" rows = "30" cols="80" onkeydown="startParser();">
+function example1(_sad) {
+  return _y;
+  if(_y) print(_a);
+  /*scs
+    -> pidr;;
+  */
+  dsa;
+  /*scs
+    -> pidr;;
+  */
+}</textarea>
+        </td>
+        <td>
+        <div id="program"></div>
+        </td>
+      </tr>
+    </table>  
+  </body>
+</html>

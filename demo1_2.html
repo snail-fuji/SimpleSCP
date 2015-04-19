@@ -11,22 +11,41 @@ function startParser() {
   document.getElementById("program").innerHTML = parse(document.getElementById("source").value);
 }
     </script>
+    <title>SimpleSCP 1.2</title>
   </head>
   <body>
     <table>
       <tr>
         <td>
-          <textarea id="source" rows = "30" cols="80" onkeydown="startParser();">
-function example1(_sad) {
-  return _y;
-  if(_y) print(_a);
-  /*scs
-    -> pidr;;
-  */
-  dsa;
-  /*scs
-    -> pidr;;
-  */
+          <textarea id="source" rows = "30" cols="80" onkeydown="startParser()">
+function example(_scp_program) {
+  search(
+    _scp_program, 
+    [assign, _tmp_arc_1], 
+    [assign, _pattern], 
+    [assign, _tmp_arc_2], 
+    nrel_error_pattern,
+    [], [], [assign, _patterns], [], []    
+  );
+  while(search(patterns, [assign, _arc], [assign, _pattern])) {
+    sys_search(
+      _pattern,
+      [assign, _result],
+      pattern_params,
+      [assign, _all_elements]
+    );
+    /*scs
+      pattern_params -> ... (*
+        -> rrel_1: rrel_fixed: rrel_scp_const: _target_scp_program;;
+        -> rrel_2: rrel_fixed: rrel_scp_var: _scp_program;;
+      *);;
+    */
+    if(_result) {
+      proc_generate_error(_scp_program);
+      print("Error!");
+    }
+    erase([erase, _arc]); 
+  }
 }</textarea>
         </td>
         <td>
