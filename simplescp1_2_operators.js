@@ -114,7 +114,6 @@ function EmptyOperator() {
 function BlockOperator(operators) {
   ComplicatedOperator.call(this, operators);
   this.addTransition = function(transition) {
-    //TODO There is an error!!!!!
     if (!this.isEmpty()) 
       this.operators[this.operators.length - 1].addTransition(transition);
   }
@@ -165,22 +164,17 @@ function WhileOperator(testOperator, loopOperator) {
   this.initTransitions();
 }
 
-function ForInOperator(iterator, iterable) {
-  ComplicatedOperator.call(this, [testOperator, loopOperator]);
-  this.addTransition = function(transition) {
-      this.operators[0].addTransition(new ElseTransition(transition.getOperator()));
-  }
-  this.initTransitions = function() {
-    if (!this.operators[1].isEmpty()) {
-      this.operators[0].addTransition(new ThenTransition(this.operators[1]));
-      this.operators[1].addTransition(new GotoTransition(this.operators[0]));
-    }
-    else {
-      this.operators[0].addTransition(new ThenTransition(this.operators[0]));
-    }
-  }
-  this.initTransitions();
-}
+/*function ForInOperator(iterator, iterable, body) {
+  var arc = new ScpVarArgument(new PosConstPermArgument(new RandomArgument()));
+  var element = new ScpVarArgument(new AssignArgument(new RandomArgument()));
+  var copySet = new ScpVarArgument(new FixedArgument(new RandomArgument()));
+  var copyOperator = new SearchSetStr3Operator([iterable, arc, element, undefined, undefined, new AssignArgument(copySet)]);
+  //TODO iterable must be assign
+  var searchOperator = new SearchElStr3Operator([new FixedArgument(copySet), arc, iterable]);
+  var eraseOperator = new EraseElOperator([new EraseArgument()])
+  var whileOperator = new WhileOperator(searchOperator, body);
+  var mainBlock = new BlockOperator([copyOperator, searchOperator]);
+}*/
 
 /*function DoWhileOperator(testOperator, loopOperator) {
   ComplicatedOperator.call(this, [loopOperator, testOperator]);

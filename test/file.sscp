@@ -1,5 +1,0 @@
-function olo() {
-  while(search(_set, [assign, _arc], [assign, _element])) {
-    erase([erase, _element]);
-  }
-}

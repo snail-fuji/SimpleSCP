@@ -74,13 +74,26 @@ const modifiers = {
   "common":CommonArgument,
 }
 function parse(code) {
+  SCSCode = getSCSCode(code);
   syntax = esprima.parse(code);
-  return format(design(parseFunction(syntax.body[0]).toString()));
+  return format(design(parseFunction(syntax.body[0]).toString() + SCSCode));
 }
 
 function consoleParse(code) {
+  SCSCode = getSCSCode(code);
   syntax = esprima.parse(code);
-  return formatConsole(design(parseFunction(syntax.body[0]).toString()));
+  return formatConsole(design(parseFunction(syntax.body[0]).toString() + SCSCode));
+}
+
+function getSCSCode(code) {
+  allSCS = code.match(/\/\*scs[^\*]*\*\//g);
+  SCSCode = "";
+  for(var i = 0; i < allSCS.length; i++) {
+    var SCSLine = allSCS[i].substr(5);
+    SCSLine = SCSLine.substr(0, SCSLine.length - 2);
+    SCSCode += "<br>" + SCSLine;
+  }
+  return SCSCode;
 }
 
 function format(string) {
@@ -152,6 +165,8 @@ function parseStatement(statement) {
       return parseIfVarAssignExpression(statement);
     case "WhileStatement":
       return parseWhileStatement(statement);
+    case "ForInStatement":
+      return parseForInStatement(statement);
     default:
       return new EmptyOperator();
   }
@@ -169,6 +184,13 @@ function parseWhileStatement(statement) {
   var body = parseStatement(statement.body);
   return new WhileOperator(test, body);
 }
+
+function parseForInStatement(statement) {
+  var left = parseArgument(statement.left);
+  var right = parseArgument(statement.right);
+  var body = parseStatement(statement.body);  
+  return new ForInStatement(left, right, body);
+} 
 
 function parseExpressionStatement(expression) {
   switch(expression.type) {
