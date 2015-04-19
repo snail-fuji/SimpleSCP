@@ -87,10 +87,10 @@ function consoleParse(code) {
 }
 
 function getSCSCode(code) {
-  allSCS = code.split(/(\/\*scs)|(\*\/)/g);
+  allSCS = code.split(/(\/\*scs)|(\*\/scs)/g);
   SCSCode = "";
   for(var i = 0; i < allSCS.length; i++) {
-    if (i % 2 != 0 && allSCS[i] != "/*scs" && allSCS[i] != "*/") 
+    if (i % 2 != 0 && allSCS[i] != "/*scs" && allSCS[i] != "scs*/") 
       SCSCode += "<br>" + allSCS[i];
   }
   return SCSCode;

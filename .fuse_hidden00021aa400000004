@@ -25,11 +25,11 @@ const languageOperators = {
   "search2":SearchSetOperator,
   "search6":SearchSetStr3Operator,
   "search10":SearchSetStr5Operator,
-  //"generate1":GenElOperator,
+  "generate1":GenElOperator,
   "generate3":GenElStr3Operator,
   "sys_generate4":SysGenerateOperator,
   "generate5":GenElStr5Operator,
-  "generate2":GenSetOperator,
+  //"generate2":GenSetOperator,
   "generate6":GenSetStr3Operator,
   "generate10":GenSetStr5Operator,
   "erase1":EraseElOperator,
@@ -50,6 +50,7 @@ const languageOperators = {
   "acos2":ContArccosOperator,
   "asin2":ContArcsinOperator,
   "greater2":IfGreaterOperator,
+  "show1":PrintElOperator,
 }
 const modifiersNames = [
   "fixed",
