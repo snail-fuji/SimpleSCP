@@ -82,6 +82,12 @@ function SysSearchOperator(arguments) {
 function PrintElOperator(arguments) {
   SimpleOperator.call(this, "printEl", arguments);
 }
+function IfEqOperator(arguments) {
+  SimpleOperator.call(this, "ifEq", arguments);
+}
+function IfCoinOperator(arguments) {
+  SimpleOperator.call(this, "ifCoin", arguments);
+}
 function GenSetOperator(arguments) {
   SetOperator.call(this, "genSet", arguments);
 }

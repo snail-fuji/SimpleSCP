@@ -16,6 +16,8 @@ const languageOperatorsNames = [
   "acos",
   "asin",
   "greater",
+  "equals",
+  "is"
 ]
 const languageOperators = {
   "search1":SearchElOperator,
@@ -51,6 +53,8 @@ const languageOperators = {
   "asin2":ContArcsinOperator,
   "greater2":IfGreaterOperator,
   "show1":PrintElOperator,
+  "is2":IfCoinOperator,
+  "equals2":IfEqOperator,
 }
 const modifiersNames = [
   "fixed",
@@ -87,7 +91,7 @@ function consoleParse(code) {
 }
 
 function getSCSCode(code) {
-  allSCS = code.split(/(\/\*scs)|(\*\/scs)/g);
+  allSCS = code.split(/(\/\*scs)|(scs\*\/)/g);
   SCSCode = "";
   for(var i = 0; i < allSCS.length; i++) {
     if (i % 2 != 0 && allSCS[i] != "/*scs" && allSCS[i] != "scs*/") 
