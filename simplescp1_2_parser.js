@@ -17,7 +17,8 @@ const languageOperatorsNames = [
   "asin",
   "greater",
   "equals",
-  "is"
+  "is", 
+  "show",
 ]
 const languageOperators = {
   "search1":SearchElOperator,
