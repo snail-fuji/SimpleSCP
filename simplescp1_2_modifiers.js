@@ -25,6 +25,9 @@ function ScpVarArgument(argument) {
 function ScpConstArgument(argument) {
   ArgumentDecorator.call(this, "scp_const", argument);
 }
+function ConstArgument(argument) {
+  ArgumentDecorator.call(this, "const", argument);
+}
 function CommonArgument(argument) {
   ArgumentDecorator.call(this, "common", argument);
 }

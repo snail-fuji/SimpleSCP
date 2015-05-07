@@ -64,7 +64,8 @@ const modifiersNames = [
   "arc",
   "node",
   "erase",
-  "variable",
+  "scp_variable",
+  "scp_constant",
   "constant",
   "common",
 ]
@@ -75,9 +76,10 @@ const modifiers = {
   "arc":ArcArgument,
   "node":NodeArgument,
   "erase":EraseArgument,
-  "variable":ScpVarArgument,
-  "constant":ScpConstArgument,
+  "scp_variable":ScpVarArgument,
+  "scp_constant":ScpConstArgument,
   "common":CommonArgument,
+  "constant":ConstArgument,
 }
 function parse(code) {
   SCSCode = getSCSCode(code);
@@ -273,14 +275,16 @@ function pushPartOfArgument(part, argument) {
   else
     argument.push("[" + part.value + "]");
 }
-
+/**
+  Method, which creates default arguments for scp variables and constants
+*/
 function preprocessArgument(argument) {
   if (argument.length == 0) return [];
   var preprocessedArgument = argument;
   argumentName = preprocessedArgument[preprocessedArgument.length - 1];
-  if (preprocessedArgument.indexOf("constant") == -1 && preprocessedArgument.indexOf("variable") == -1) {
-    if (isVariable(argumentName)) preprocessedArgument.unshift("variable");
-    else preprocessedArgument.unshift("constant");
+  if (preprocessedArgument.indexOf("scp_constant") == -1 && preprocessedArgument.indexOf("scp_variable") == -1) {
+    if (isVariable(argumentName)) preprocessedArgument.unshift("scp_variable");
+    else preprocessedArgument.unshift("scp_constant");
   }
   if (preprocessedArgument.indexOf("fixed") == -1 && preprocessedArgument.indexOf("assign") == -1)
         preprocessedArgument.unshift("fixed");

@@ -1,6 +1,7 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="jquery-2.1.3.min.js"></script>
     <script src="esprima.js"></script>
     <script src="simplescp1_2.js"></script>
     <script src="simplescp1_2_modifiers.js"></script>
@@ -11,6 +12,30 @@ function startParser() {
   document.getElementById("program").innerHTML = parse(document.getElementById("source").value);
 }
     </script>
+<script type="text/javascript">
+function selectText() {
+ var e= $("#program")[0]; 
+ if(window.getSelection){ 
+ var s=window.getSelection(); 
+ if(s.setBaseAndExtent){ 
+ s.setBaseAndExtent(e,0,e,e.innerText.length-1); 
+ }else{ 
+ var r=document.createRange(); 
+ r.selectNodeContents(e); 
+ s.removeAllRanges(); 
+ s.addRange(r);} 
+ }else if(document.getSelection){ 
+ var s=document.getSelection(); 
+ var r=document.createRange(); 
+ r.selectNodeContents(e); 
+ s.removeAllRanges(); 
+ s.addRange(r); 
+ }else if(document.selection){ 
+ var r=document.body.createTextRange(); 
+ r.moveToElementText(e); 
+ r.select();}
+}
+</script>
     <title>SimpleSCP 1.2</title>
   </head>
   <body>
@@ -49,7 +74,7 @@ function example(_scp_program) {
 }</textarea>
         </td>
         <td>
-        <div id="program"></div>
+        <div id="program" onclick="selectText();"></div>
         </td>
       </tr>
     </table>  
