@@ -43,3 +43,6 @@ function InArgument(argument) {
 function OutArgument(argument) {
   ArgumentDecorator.call(this, "out", argument);
 }
+function LinkArgument(argument) {
+  ArgumentDecorator.call(this, "link", argument);
+}

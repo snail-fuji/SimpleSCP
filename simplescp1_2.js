@@ -170,6 +170,12 @@ function RandomArgument() {
   SimpleArgument.call(this, "_argument" + Math.floor(Math.random()*65536));
 }
 
+
+//TODO check this
+function EscapeArgument(argument) {
+  SimpleArgument.call(this, argument.getName());
+}
+
 function ArgumentDecorator(name, argument) {
   Argument.call(this, name);
   this.argument = argument;

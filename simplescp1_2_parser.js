@@ -68,6 +68,7 @@ const modifiersNames = [
   "scp_constant",
   "constant",
   "common",
+  "link",
 ]
 const modifiers = {
   "fixed":FixedArgument,
@@ -80,6 +81,7 @@ const modifiers = {
   "scp_constant":ScpConstArgument,
   "common":CommonArgument,
   "constant":ConstArgument,
+  "link":LinkArgument,
 }
 function parse(code) {
   SCSCode = getSCSCode(code);
