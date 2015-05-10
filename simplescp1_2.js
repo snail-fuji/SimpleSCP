@@ -1,3 +1,8 @@
+/**
+The constructor of a program
+@params name of program, array of parameters, array of operators
+@return program
+*/
 function Program(name, parameters, operators) {
   this.name = name;
   this.parameters = parameters || [];
@@ -35,13 +40,23 @@ function Program(name, parameters, operators) {
   }
 }
 
+/**
+  Base constructor for operators
+  @return operator with random id
+*/
 function Operator() {
   this.id = Math.floor(Math.random()*65536);
 }
 
+/**
+  Constructor for non-complicated operators
+  @params type of operator
+  @return basic operator with toString() method
+*/
 function BasicOperator(type) {
   Operator.call(this);
   this.type = type;
+  this.arguments = [];
   this.transitions = [];
   this.additionalInfo = "";
   this.isEmpty = function() {
@@ -83,10 +98,15 @@ function BasicOperator(type) {
   }
 }
 
+/**
+  Constructor for operators without rrel_set arguments
+  @params type of operator, arguments
+  @return operator with toString() method
+*/
 function SimpleOperator(type, arguments) {
   BasicOperator.call(this, type);
   this.setArguments = function(arguments) {
-    this.arguments = [];
+    //Remove this.arguments = [];
     for(var i = 0; i < arguments.length; i++) {
       if (!arguments[i]) continue;
       this.arguments.push(new NumberArgument((i + 1), arguments[i]));
@@ -98,7 +118,7 @@ function SimpleOperator(type, arguments) {
 function SetOperator(type, arguments) {
   BasicOperator.call(this, type);
   this.setArguments = function(arguments) {
-    this.arguments = [];
+    //Remove this.arguments = [];
     for(var i = 0; i < arguments.length; i++) {
       var argument = arguments[i];
       if (!argument) continue;
@@ -168,12 +188,6 @@ function SimpleArgument(name) {
 
 function RandomArgument() {
   SimpleArgument.call(this, "_argument" + Math.floor(Math.random()*65536));
-}
-
-
-//TODO check this
-function EscapeArgument(argument) {
-  SimpleArgument.call(this, argument.getName());
 }
 
 function ArgumentDecorator(name, argument) {
