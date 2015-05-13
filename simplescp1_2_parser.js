@@ -19,6 +19,7 @@ const languageOperatorsNames = [
   "equals",
   "is", 
   "show",
+  "has_value",
 ]
 const languageOperators = {
   "search1":SearchElOperator,
@@ -56,6 +57,7 @@ const languageOperators = {
   "show1":PrintElOperator,
   "is2":IfCoinOperator,
   "equals2":IfEqOperator,
+  "has_value1":IfVarAssignOperator,
 }
 const modifiersNames = [
   "fixed",
