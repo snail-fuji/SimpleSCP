@@ -1,13 +1,20 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="jquery-2.1.3.min.js"></script>
+    <script src="bootstrap.min.js"></script>
     <script src="esprima.js"></script>
     <script src="simplescp1_2.js"></script>
     <script src="simplescp1_2_modifiers.js"></script>
     <script src="simplescp1_2_operators.js"></script>
     <script src="simplescp1_2_parser.js"></script>
     <script>
+$(function () {
+  $('#myTab a').click(function (e) {
+    $(this).tab('show');
+  });
+});
 function startParser() {
   document.getElementById("program").innerHTML = parse(document.getElementById("source").value);
 }
@@ -39,44 +46,33 @@ function selectText() {
     <title>SimpleSCP 1.2</title>
   </head>
   <body>
-    <table>
-      <tr>
-        <td>
-          <textarea id="source" rows = "30" cols="80" onkeydown="startParser()">
-function example(_scp_program) {
-  search(
-    _scp_program, 
-    [assign, _tmp_arc_1], 
-    [assign, _pattern], 
-    [assign, _tmp_arc_2], 
-    nrel_error_pattern,
-    [], [], [assign, _patterns], [], []    
-  );
-  while(search(patterns, [assign, _arc], [assign, _pattern])) {
-    sys_search(
-      _pattern,
-      [assign, _result],
-      pattern_params,
-      [assign, _all_elements]
-    );
-    /*scs
-      pattern_params -> ... (*
-        -> rrel_1: rrel_fixed: rrel_scp_const: _target_scp_program;;
-        -> rrel_2: rrel_fixed: rrel_scp_var: _scp_program;;
-      *);;
-    scs*/
-    if(_result) {
-      proc_generate_error(_scp_program);
-      print("Error!");
-    }
-    erase([erase, _arc]); 
-  }
+  <ul class="nav nav-tabs" id="allTabs">
+  <li class="active"><a href="#translator" data-toggle="tab">Translator</a></li>
+  <li><a href="#documentation" data-toggle="tab">Documentation</a></li>
+  <li><a href="#github" data-toggle="tab">GitHub</a></li>
+</ul>
+<div class="tab-content">
+  <div class="tab-pane active" id="translator">
+    <div class="col-md-6">
+      <textarea id="source" class="form-control" rows = "30" onkeydown="startParser()">
+function example() {
+  print("Hello world!");
 }</textarea>
-        </td>
-        <td>
-        <div id="program" onclick="selectText();"></div>
-        </td>
-      </tr>
-    </table>  
+    </div>
+    <div id="program" onclick="selectText();" class="col-md-5"></div>  
+  </div>
+  <div class="tab-pane" id="documentation"><iframe src="https://drive.google.com/file/d/0B1ZQRhNtjPaoeWtZdnM3Z0xCWWs/preview" width="100%" height="500px"></iframe></div>
+  <div class="tab-pane" id="github"><div class="hero-unit text-center">
+    <h1>Interested in?</h1>
+    <p>You can get sources of this project on github.com</p>
+    <img src="./img/Octocat.png" width="auto" height="300px"/>
+    <p>
+      <a class="btn btn-primary btn-large" href="https://github.com/belya/SimpleSCP">
+        Go to github
+      </a>
+    </p>
+  </div>
+</div>
+</div>
   </body>
 </html>
