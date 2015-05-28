@@ -85,6 +85,7 @@ const modifiers = {
   "constant":ConstArgument,
   "link":LinkArgument,
 }
+
 function parse(code) {
   SCSCode = getSCSCode(code);
   syntax = esprima.parse(code);
