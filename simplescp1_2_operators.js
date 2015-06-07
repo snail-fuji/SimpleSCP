@@ -88,37 +88,37 @@ function IfEqOperator(arguments) {
 function IfCoinOperator(arguments) {
   SimpleOperator.call(this, "ifCoin", arguments);
 }
-function StringIfEq(arguments) { 
+function StringIfEqOperator(arguments) { 
   SimpleOperator.call(this, "stringIfEq", arguments); 
 }
-function StringIfGr(arguments) { 
+function StringIfGrOperator(arguments) { 
   SimpleOperator.call(this, "stringIfGr", arguments); 
 }
-function StringSplit(arguments) { 
+function StringSplitOperator(arguments) { 
   SimpleOperator.call(this, "stringSplit", arguments); 
 }
-function StringLen(arguments) { 
+function StringLenOperator(arguments) { 
   SimpleOperator.call(this, "stringLen", arguments); 
 }
-function StringSub(arguments) { 
+function StringSubOperator(arguments) { 
   SimpleOperator.call(this, "stringSub", arguments); 
 }
-function StringSlice(arguments) { 
+function StringSliceOperator(arguments) { 
   SimpleOperator.call(this, "stringSlice", arguments); 
 }
-function StringStartsWith(arguments) { 
+function StringStartsWithOperator(arguments) { 
   SimpleOperator.call(this, "stringStartsWith", arguments); 
 }
-function StringEndsWith(arguments) { 
+function StringEndsWithOperator(arguments) { 
   SimpleOperator.call(this, "stringEndsWith", arguments); 
 }
-function StringReplace(arguments) { 
+function StringReplaceOperator(arguments) { 
   SimpleOperator.call(this, "stringReplace", arguments); 
 }
-function StringToUpperCase(arguments) { 
+function StringToUpperCaseOperator(arguments) { 
   SimpleOperator.call(this, "stringToUpperCase", arguments); 
 }
-function StringToLowerCase(arguments) { 
+function StringToLowerCaseOperator(arguments) { 
   SimpleOperator.call(this, "stringToLowerCase", arguments); 
 }
 function GenSetOperator(arguments) {

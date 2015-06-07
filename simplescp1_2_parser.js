@@ -69,17 +69,17 @@ const languageOperators = {
   "is2":IfCoinOperator,
   "equals2":IfEqOperator,
   "has_value1":IfVarAssignOperator,
-  "stringIfEq2": StringIfEq,
-  "stringIfGr2": StringIfGr,
-  "stringSplit3": StringSplit,
-  "stringLen2": StringLen,
-  "stringSub3": StringSub,
-  "stringSlice4": StringSlice,
-  "stringStartsWith2": StringStartsWith,
-  "stringEndsWith2": StringEndsWith,
-  "stringReplace4": StringReplace,
-  "stringToUpperCase2": StringToUpperCase,
-  "stringToLowerCase2": StringToLowerCase,
+  "stringIfEq2": StringIfEqOperator,
+  "stringIfGr2": StringIfGrOperator,
+  "stringSplit3": StringSplitOperator,
+  "stringLen2": StringLenOperator,
+  "stringSub3": StringSubOperator,
+  "stringSlice4": StringSliceOperator,
+  "stringStartsWith2": StringStartsWithOperator,
+  "stringEndsWith2": StringEndsWithOperator,
+  "stringReplace4": StringReplaceOperator,
+  "stringToUpperCase2": StringToUpperCaseOperator,
+  "stringToLowerCase2": StringToLowerCaseOperator,
 }
 const modifiersNames = [
   "fixed",
@@ -232,8 +232,22 @@ function parseExpressionStatement(expression) {
       return parseCallExpression(expression);
     case "Identifier":
       return parseIfVarAssignExpression(expression);
+    //case "BinaryExpression":
+      //return parseBinaryExpression(expression);
   }
 }
+
+/*function parseBinaryExpression(expression) {
+  switch(expression.operator) {
+    case "==":
+      return parseEqualExpression(expression);
+  }
+}
+
+function parseEqualExpression(expression) {
+  var arguments = [expression.left, expression.right];
+  var useNumberComparing = (typeof expression.left == 'number' && expression.right )
+}*/
 
 function parseIfVarAssignExpression(expression) {
   return new IfVarAssignOperator([processArgument(preprocessArgument([expression.name]))]);
@@ -302,9 +316,7 @@ function pushPartOfArgument(part, argument) {
   else
     argument.push("[" + part.value + "]");
 }
-/**
-  Method, which creates default arguments for scp variables and constants
-*/
+
 function preprocessArgument(argument) {
   if (argument.length == 0) return [];
   var preprocessedArgument = argument;
