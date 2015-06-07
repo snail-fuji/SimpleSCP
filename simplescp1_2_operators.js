@@ -88,6 +88,39 @@ function IfEqOperator(arguments) {
 function IfCoinOperator(arguments) {
   SimpleOperator.call(this, "ifCoin", arguments);
 }
+function StringIfEq(arguments) { 
+  SimpleOperator.call(this, "stringIfEq", arguments); 
+}
+function StringIfGr(arguments) { 
+  SimpleOperator.call(this, "stringIfGr", arguments); 
+}
+function StringSplit(arguments) { 
+  SimpleOperator.call(this, "stringSplit", arguments); 
+}
+function StringLen(arguments) { 
+  SimpleOperator.call(this, "stringLen", arguments); 
+}
+function StringSub(arguments) { 
+  SimpleOperator.call(this, "stringSub", arguments); 
+}
+function StringSlice(arguments) { 
+  SimpleOperator.call(this, "stringSlice", arguments); 
+}
+function StringStartsWith(arguments) { 
+  SimpleOperator.call(this, "stringStartsWith", arguments); 
+}
+function StringEndsWith(arguments) { 
+  SimpleOperator.call(this, "stringEndsWith", arguments); 
+}
+function StringReplace(arguments) { 
+  SimpleOperator.call(this, "stringReplace", arguments); 
+}
+function StringToUpperCase(arguments) { 
+  SimpleOperator.call(this, "stringToUpperCase", arguments); 
+}
+function StringToLowerCase(arguments) { 
+  SimpleOperator.call(this, "stringToLowerCase", arguments); 
+}
 function GenSetOperator(arguments) {
   SetOperator.call(this, "genSet", arguments);
 }
